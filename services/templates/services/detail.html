@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}{{ service.title }} | Freelance Services{% endblock %}
+{% block content %}
+<div class="container section">
+    <div class="split-block">
+        <div>
+            <h1>{{ service.title }}</h1>
+            <p class="meta">{{ service.client_name|default:'Client project' }} &middot; {{ service.get_category_display }}</p>
+            <p>{{ service.description }}</p>
+            <p><strong>Skills required:</strong> {{ service.skills_required|default:'Not specified' }}</p>
+            <p><strong>Budget:</strong> {{ service.budget_range|default:'Undisclosed' }}</p>
+            <p><strong>Timeline:</strong> {{ service.timeline|default:'Flexible' }}</p>
+            <p><strong>Location:</strong> {{ service.location|default:'Remote / anywhere' }}</p>
+            <p><strong>Deadline:</strong> {{ service.deadline }}</p>
+        </div>
+        <div class="highlight-card">
+            <h3>Ready to apply?</h3>
+            <p>Submit your proposal and expected rate to connect with this client service request.</p>
+            <a href="{% url 'services:apply' service.pk %}" class="btn btn-primary">Apply now</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Login | VETA Connect{% endblock %}
+{% block content %}
+<div class="container auth-card">
+    <h1>Login</h1>
+    <p>Access your VETA Connect student dashboard.</p>
+    <form method="post" class="form-card">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <label>Username</label>
+        {{ form.username }}
+        <label>Password</label>
+        {{ form.password }}
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+    <p class="small-text">New to VETA? <a href="/accounts/register/">Create an account</a>.</p>
+</div>
+{% endblock %}

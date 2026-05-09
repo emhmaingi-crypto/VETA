@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}My Mentorship Requests | VETA Connect{% endblock %}
+{% block content %}
+<div class="container section">
+    <h1>My mentorship requests</h1>
+    {% if requests %}
+        <div class="data-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mentor</th>
+                        <th>Status</th>
+                        <th>Requested</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in requests %}
+                        <tr>
+                            <td><a href="{% url 'mentorship:detail' request.mentor.pk %}">{{ request.mentor.name }}</a></td>
+                            <td>{{ request.status|title }}</td>
+                            <td>{{ request.created_at|date:'M d, Y' }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="card full-card">
+            <p>You have no mentorship requests yet.</p>
+            <a href="/mentorship/" class="btn btn-primary">Find a mentor</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

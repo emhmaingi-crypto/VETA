@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Apply for {{ service.title }} | Freelance Services{% endblock %}
+{% block content %}
+<div class="container section">
+    <h1>Apply for {{ service.title }}</h1>
+    <div class="cards-grid">
+        <article class="card">
+            <h2>Project details</h2>
+            <p>{{ service.description }}</p>
+            <p><strong>Skills needed:</strong> {{ service.skills_required|default:'Not specified' }}</p>
+            <p><strong>Budget:</strong> {{ service.budget_range|default:'Undisclosed' }}</p>
+            <p><strong>Deadline:</strong> {{ service.deadline }}</p>
+        </article>
+        <article class="card">
+            <h2>Submit your proposal</h2>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Submit proposal</button>
+            </form>
+        </article>
+    </div>
+</div>
+{% endblock %}

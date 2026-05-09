@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Edit Profile | VETA Connect{% endblock %}
+{% block content %}
+<div class="container auth-card">
+    <h1>Edit your profile</h1>
+    <form method="post" enctype="multipart/form-data" class="form-card">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% for field in form %}
+            <label>{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+                <small>{{ field.help_text }}</small>
+            {% endif %}
+            {{ field.errors }}
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Save changes</button>
+    </form>
+</div>
+{% endblock %}

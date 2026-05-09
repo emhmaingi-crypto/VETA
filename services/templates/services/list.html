@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Freelance Services | VETA Connect{% endblock %}
+{% block content %}
+<div class="container section">
+    <h1>Freelance services</h1>
+    <p>Find short-term freelance work, client projects, and service requests matched to your TVET skills.</p>
+    <p>Need help troubleshooting a technical issue? Use our AI tech support assistant for network, device, and user support guidance.</p>
+    <div class="hero-actions" style="margin-bottom: 1.5rem; gap: 0.75rem;">
+        <a href="{% url 'services:ai_support' %}" class="btn btn-primary">AI Tech Support</a>
+    </div>
+    <form method="get" class="search-form">
+        <input type="text" name="q" placeholder="Search services or skills" value="{{ query }}" />
+        <select name="category">
+            <option value="">All categories</option>
+            {% for value, label in categories %}
+                <option value="{{ value }}" {% if value == category %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    {% if services %}
+        <div class="cards-grid">
+            {% for service in services %}
+                <article class="card">
+                    <h3><a href="{{ service.get_absolute_url }}">{{ service.title }}</a></h3>
+                    <p class="meta">{{ service.client_name|default:'Client project' }} &middot; {{ service.category|title }}</p>
+                    <p>{{ service.description|truncatechars:140 }}</p>
+                    <p><strong>Skills:</strong> {{ service.skills_required|default:'None listed' }}</p>
+                    <p><strong>Budget:</strong> {{ service.budget_range|default:'Undisclosed' }}</p>
+                    <a href="{{ service.get_absolute_url }}" class="btn btn-outline">View details</a>
+                </article>
+            {% endfor %}
+        </div>
+        {% if is_paginated %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?q={{ query }}&category={{ category }}&page={{ page_obj.previous_page_number }}">Previous</a>
+                {% endif %}
+                <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}
+                    <a href="?q={{ query }}&category={{ category }}&page={{ page_obj.next_page_number }}">Next</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="card full-card">
+            <p>No freelance services found. Try a broader search or check back later.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

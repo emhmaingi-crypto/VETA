@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard | VETA Connect{% endblock %}
+{% block content %}
+<div class="container dashboard-grid">
+    <div class="dashboard-card">
+        <h2>Welcome back, {{ user.first_name }}!</h2>
+        <p>Your profile is {% if profile_complete %}<span class="badge badge-success">complete</span>{% else %}<span class="badge badge-warning">incomplete</span>{% endif %}. Keep building your skills.</p>
+        <div class="stats-grid">
+            <div>
+                <strong>{{ applications.count }}</strong>
+                <p>Applications</p>
+            </div>
+            <div>
+                <strong>{{ requests.count }}</strong>
+                <p>Mentorship requests</p>
+            </div>
+            <div>
+                <strong>{{ service_applications.count }}</strong>
+                <p>Freelance proposals</p>
+            </div>
+            <div>
+                <strong>{{ scholarships|length }}</strong>
+                <p>Scholarship options</p>
+            </div>
+        </div>
+        <div class="dashboard-actions">
+            <a href="/opportunities/" class="btn btn-primary">Browse opportunities</a>
+            <a href="/services/" class="btn btn-outline">Browse freelance services</a>
+        </div>
+    </div>
+    <div class="dashboard-card">
+        <h3>Recent applications</h3>
+        {% if applications %}
+            <ul class="compact-list">
+                {% for application in applications %}
+                    <li>{{ application.opportunity.title }} — <strong>{{ application.status|title }}</strong></li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No recent applications yet.</p>
+        {% endif %}
+        <h3>Recent mentor requests</h3>
+        {% if requests %}
+            <ul class="compact-list">
+                {% for request in requests %}
+                    <li>{{ request.mentor.name }} — <strong>{{ request.status|title }}</strong></li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No mentorship requests yet.</p>
+        {% endif %}
+
+        <h3>Recent freelance proposals</h3>
+        {% if service_applications %}
+            <ul class="compact-list">
+                {% for application in service_applications %}
+                    <li>{{ application.listing.title }} — <strong>{{ application.status|title }}</strong></li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No freelance proposals submitted yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

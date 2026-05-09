@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}{{ mentor.name }} | VETA Connect{% endblock %}
+{% block content %}
+<div class="container section detail-grid">
+    <div>
+        <h1>{{ mentor.name }}</h1>
+        <p class="muted">{{ mentor.title }} · {{ mentor.organisation }}</p>
+        <p>{{ mentor.bio }}</p>
+        <h3>Expertise</h3>
+        <p>{{ mentor.expertise }}</p>
+        <p><strong>Email:</strong> {{ mentor.email }}</p>
+        <p><strong>LinkedIn:</strong> <a href="{{ mentor.linkedin_url }}">Visit profile</a></p>
+        <a href="{% url 'mentorship:request' mentor.pk %}" class="btn btn-primary">Request mentorship</a>
+    </div>
+    <aside class="detail-panel">
+        <div class="info-block">
+            <strong>Slots available</strong>
+            <span>{{ mentor.slots_available }}</span>
+        </div>
+    </aside>
+</div>
+{% endblock %}

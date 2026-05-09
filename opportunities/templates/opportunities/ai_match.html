@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}AI Match | VETA Connect{% endblock %}
+{% block content %}
+<div class="container section">
+    <h1>AI opportunity matching</h1>
+    <p>VETA Connect uses your profile and skills to recommend the best fits.</p>
+    {% if error %}
+        <div class="card full-card">
+            <p class="text-danger">{{ error }}</p>
+        </div>
+    {% else %}
+        {% if matches %}
+            <div class="cards-grid">
+                {% for match in matches %}
+                    <article class="card">
+                        <h3>
+                            {% if match.url %}
+                                <a href="{{ match.url }}">{{ match.title }}</a>
+                            {% else %}
+                                Opportunity ID: {{ match.id }}
+                            {% endif %}
+                        </h3>
+                        <p><strong>Score:</strong> {{ match.score }}/100</p>
+                        <p>{{ match.reason }}</p>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card full-card">
+                <p>We are preparing your personalized match list. Refresh after a moment.</p>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

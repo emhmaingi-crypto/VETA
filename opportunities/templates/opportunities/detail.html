@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}{{ opportunity.title }} | VETA Connect{% endblock %}
+{% block content %}
+<div class="container section">
+    <div class="detail-header">
+        <div>
+            <h1>{{ opportunity.title }}</h1>
+            <p class="muted">{{ opportunity.partner.name }} · {{ opportunity.get_type_display }} · {{ opportunity.county }}</p>
+        </div>
+        <a href="{{ opportunity.get_absolute_url }}apply/" class="btn btn-primary">Apply now</a>
+    </div>
+    <div class="detail-grid">
+        <div>
+            <h3>Opportunity overview</h3>
+            <p>{{ opportunity.description }}</p>
+            <h4>Requirements</h4>
+            <p>{{ opportunity.requirements|default:'No extra requirements specified.' }}</p>
+        </div>
+        <aside class="detail-panel">
+            <div class="info-block">
+                <strong>Type</strong>
+                <span>{{ opportunity.get_type_display }}</span>
+            </div>
+            <div class="info-block">
+                <strong>Level</strong>
+                <span>{{ opportunity.get_level_required_display|default:'Any' }}</span>
+            </div>
+            <div class="info-block">
+                <strong>Skills</strong>
+                <span>{{ opportunity.skills_required|default:'Not specified' }}</span>
+            </div>
+            <div class="info-block">
+                <strong>Stipend</strong>
+                <span>{{ opportunity.stipend|default:'TBD' }}</span>
+            </div>
+            <div class="info-block">
+                <strong>Deadline</strong>
+                <span>{{ opportunity.deadline }}</span>
+            </div>
+            <div class="info-block">
+                <strong>Slots</strong>
+                <span>{{ opportunity.slots }}</span>
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}

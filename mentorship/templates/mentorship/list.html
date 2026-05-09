@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Mentors | VETA Connect{% endblock %}
+{% block content %}
+<div class="container section">
+    <div class="section-heading">
+        <div>
+            <h1>Mentors</h1>
+            <p>Find industry mentors who can help you refine your TVET projects and career path.</p>
+        </div>
+    </div>
+    <form method="get" class="filter-bar">
+        <input type="text" name="q" placeholder="Search mentors or expertise" value="{{ query }}" />
+        <button type="submit" class="btn btn-outline">Search</button>
+    </form>
+
+    <div class="cards-grid">
+        {% for mentor in mentors %}
+            <article class="card">
+                <h3><a href="{{ mentor.get_absolute_url }}">{{ mentor.name }}</a></h3>
+                <p class="muted">{{ mentor.title }} · {{ mentor.organisation }}</p>
+                <p>{{ mentor.bio|truncatechars:130 }}</p>
+                <div class="card-meta">
+                    <span>Expertise: {{ mentor.expertise }}</span>
+                    <span>Slots: {{ mentor.slots_available }}</span>
+                </div>
+                <a href="{{ mentor.get_absolute_url }}" class="btn btn-outline">View profile</a>
+            </article>
+        {% empty %}
+            <div class="card full-card">
+                <p>No mentors found. Try a different search.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

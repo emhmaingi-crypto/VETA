@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Profile | VETA Connect{% endblock %}
+{% block content %}
+<div class="container profile-page">
+    <div class="profile-card">
+        <div class="profile-header">
+            <h1>{{ user.get_full_name }}</h1>
+            <p class="muted">{{ user.email }}</p>
+            <a href="/accounts/profile/edit/" class="btn btn-outline">Edit profile</a>
+        </div>
+        <div class="profile-grid">
+            <div>
+                <h3>Institution</h3>
+                <p>{{ user.institution|default:'Not set yet' }}</p>
+            </div>
+            <div>
+                <h3>Course</h3>
+                <p>{{ user.course|default:'Not set yet' }}</p>
+            </div>
+            <div>
+                <h3>Level</h3>
+                <p>{{ user.get_level_display|default:'Not set yet' }}</p>
+            </div>
+            <div>
+                <h3>Skills</h3>
+                <p>{{ user.skills|default:'Not set yet' }}</p>
+            </div>
+            <div class="wide-block">
+                <h3>About</h3>
+                <p>{{ user.bio|default:'Share your learning goals and ambitions.' }}</p>
+            </div>
+            <div class="wide-block">
+                <h3>Links</h3>
+                <p><a href="{{ user.linkedin_url }}">LinkedIn</a> | <a href="{{ user.github_url }}">GitHub</a> | <a href="{{ user.portfolio_url }}">Portfolio</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

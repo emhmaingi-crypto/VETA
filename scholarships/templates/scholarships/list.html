@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Scholarships | VETA Connect{% endblock %}
+{% block content %}
+<div class="container section">
+    <div class="section-heading">
+        <div>
+            <h1>Scholarships</h1>
+            <p>Explore financial awards, funding, and support opportunities for TVET learners.</p>
+        </div>
+    </div>
+    <form method="get" class="filter-bar">
+        <input type="text" name="q" placeholder="Search scholarship or provider" value="{{ query }}" />
+        <select name="level">
+            <option value="">All levels</option>
+            {% for value,label in level_choices %}
+                <option value="{{ value }}" {% if level == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-outline">Filter</button>
+    </form>
+
+    <div class="cards-grid">
+        {% for scholarship in scholarships %}
+            <article class="card">
+                <h3><a href="{{ scholarship.get_absolute_url }}">{{ scholarship.title }}</a></h3>
+                <p class="muted">{{ scholarship.provider }} · {{ scholarship.level|default:'All levels' }}</p>
+                <p>{{ scholarship.description|truncatechars:120 }}</p>
+                <div class="card-meta">
+                    <span>Amount: {{ scholarship.amount|default:'TBD' }}</span>
+                    <span>Deadline: {{ scholarship.deadline|default:'Open' }}</span>
+                </div>
+                <a href="{{ scholarship.get_absolute_url }}" class="btn btn-outline">View details</a>
+            </article>
+        {% empty %}
+            <div class="card full-card">
+                <p>No scholarships found. Check back soon for new funding opportunities.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

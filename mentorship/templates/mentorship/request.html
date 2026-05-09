@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Request Mentor | VETA Connect{% endblock %}
+{% block content %}
+<div class="container auth-card">
+    <h1>Request mentorship from {{ mentor.name }}</h1>
+    <p>Tell your mentor what you want to learn and the goals you want to achieve.</p>
+    <form method="post" class="form-card">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <label>Message</label>
+        {{ form.message }}
+        <label>Learning goals</label>
+        {{ form.goals }}
+        <button type="submit" class="btn btn-primary">Send request</button>
+    </form>
+</div>
+{% endblock %}

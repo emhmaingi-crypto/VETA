@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}{{ scholarship.title }} | VETA Connect{% endblock %}
+{% block content %}
+<div class="container section detail-grid">
+    <div>
+        <h1>{{ scholarship.title }}</h1>
+        <p class="muted">{{ scholarship.provider }} · {{ scholarship.get_level_display|default:'Open to all levels' }}</p>
+        <p>{{ scholarship.description }}</p>
+        <h3>Eligibility</h3>
+        <p>{{ scholarship.eligibility|default:'Eligibility details not provided yet.' }}</p>
+        <h3>Funding</h3>
+        <p>{{ scholarship.amount|default:'Amount disclosed upon inquiry.' }}</p>
+        <a href="{{ scholarship.apply_url }}" target="_blank" class="btn btn-primary">Apply now</a>
+    </div>
+    <aside class="detail-panel">
+        <div class="info-block">
+            <strong>Deadline</strong>
+            <span>{{ scholarship.deadline|default:'Open' }}</span>
+        </div>
+        <div class="info-block">
+            <strong>Provider</strong>
+            <span>{{ scholarship.provider }}</span>
+        </div>
+    </aside>
+</div>
+{% endblock %}

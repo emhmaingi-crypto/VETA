@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}My Freelance Applications | VETA Connect{% endblock %}
+{% block content %}
+<div class="container section">
+    <h1>My freelance applications</h1>
+    {% if applications %}
+        <div class="cards-grid">
+            {% for application in applications %}
+                <article class="card">
+                    <h3><a href="{{ application.listing.get_absolute_url }}">{{ application.listing.title }}</a></h3>
+                    <p><strong>Status:</strong> {{ application.status|title }}</p>
+                    <p><strong>Submitted:</strong> {{ application.created_at|date:'M j, Y' }}</p>
+                    <p>{{ application.proposal|truncatechars:160 }}</p>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card full-card">
+            <p>You don't have any freelance applications yet. Browse service requests and submit your first proposal.</p>
+            <a href="/services/" class="btn btn-primary">Browse services</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

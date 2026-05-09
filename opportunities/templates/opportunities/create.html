@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Post Opportunity | VETA Connect{% endblock %}
+{% block content %}
+<div class="container section">
+    <h1>Post a new opportunity</h1>
+    <p>Share job openings, internships, or other opportunities for TVET graduates.</p>
+    <form method="post" class="form-card">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Post Opportunity</button>
+    </form>
+</div>
+{% endblock %}

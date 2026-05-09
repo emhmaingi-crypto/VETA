@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Opportunities | VETA Connect{% endblock %}
+{% block content %}
+<div class="container section">
+    <div class="section-heading">
+        <div>
+            <h1>Opportunities</h1>
+            <p>Search jobs, internships, and attachments that fit your TVET skills and career goals.</p>
+        </div>
+        <div>
+            {% if user.is_authenticated and user.user_type in 'company,individual' %}
+                <a href="/opportunities/create/" class="btn btn-outline">Post Opportunity</a>
+            {% endif %}
+            <a href="/opportunities/ai-match/" class="btn btn-primary">AI Match</a>
+        </div>
+    </div>
+    <form method="get" class="filter-bar">
+        <input type="text" name="q" placeholder="Search skills or role" value="{{ query }}" />
+        <select name="type">
+            <option value="">All types</option>
+            {% for value,label in types %}
+                <option value="{{ value }}" {% if request.GET.type == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select name="level">
+            <option value="">All levels</option>
+            {% for value,label in levels %}
+                <option value="{{ value }}" {% if request.GET.level == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-outline">Filter</button>
+    </form>
+
+    <div class="cards-grid">
+        {% for opportunity in opportunities %}
+            <article class="card">
+                <h3><a href="{{ opportunity.get_absolute_url }}">{{ opportunity.title }}</a></h3>
+                <p class="muted">{{ opportunity.partner.name }} · {{ opportunity.get_type_display }} · {{ opportunity.county }}</p>
+                <p>{{ opportunity.description|truncatechars:120 }}</p>
+                <div class="card-meta">
+                    <span>{{ opportunity.level_required|default:'Any level' }}</span>
+                    <span>Deadline: {{ opportunity.deadline }}</span>
+                </div>
+                <a href="{{ opportunity.get_absolute_url }}" class="btn btn-outline">View details</a>
+            </article>
+        {% empty %}
+            <div class="card full-card">
+                <p>No opportunities found. Try a different query or update your profile.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}&q={{ query }}&type={{ request.GET.type }}&level={{ request.GET.level }}" class="page-link">Previous</a>
+            {% endif %}
+            <span class="page-current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&q={{ query }}&type={{ request.GET.type }}&level={{ request.GET.level }}" class="page-link">Next</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

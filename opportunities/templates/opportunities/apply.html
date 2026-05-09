@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Apply | {{ opportunity.title }}{% endblock %}
+{% block content %}
+<div class="container auth-card">
+    <h1>Apply for {{ opportunity.title }}</h1>
+    <p>Complete your application to submit your interest.</p>
+    <form method="post" class="form-card">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <label>Cover letter</label>
+        {{ form.cover_letter }}
+        <button type="submit" class="btn btn-primary">Submit application</button>
+    </form>
+</div>
+{% endblock %}

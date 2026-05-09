@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Register | VETA Connect{% endblock %}
+{% block content %}
+<div class="container auth-card">
+    <h1>Create your account</h1>
+    <p>Register as a TVET student, company, or individual to connect with opportunities and services.</p>
+    <form method="post" class="form-card">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <label>Account type</label>
+        {{ form.user_type }}
+        <label>Username</label>
+        {{ form.username }}
+        <label>First name</label>
+        {{ form.first_name }}
+        <label>Last name</label>
+        {{ form.last_name }}
+        <label>Email</label>
+        {{ form.email }}
+        <label>Password</label>
+        {{ form.password1 }}
+        <label>Confirm password</label>
+        {{ form.password2 }}
+        <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+    <p class="small-text">Already have an account? <a href="/accounts/login/">Login</a>.</p>
+</div>
+{% endblock %}
