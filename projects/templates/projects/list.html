@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Project Showcase | VETA Connect{% endblock %}
+{% block content %}
+<section class="section container">
+    <div class="page-header">
+        <div>
+            <h1>Project Showcase</h1>
+            <p class="muted">Explore real projects built by TVET trainees and graduates across Kenya.</p>
+        </div>
+        {% if user.is_authenticated and user.user_type == 'student' %}
+            <a href="{% url 'projects:create' %}" class="btn btn-primary">+ Add My Project</a>
+        {% endif %}
+    </div>
+
+    <form method="get" class="search-bar">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search projects, skills, tools…" class="search-input" />
+        <select name="course" class="select-input">
+            <option value="">All course areas</option>
+            {% for val, label in course_choices %}
+                <option value="{{ val }}" {% if val == selected_course %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-outline">Search</button>
+    </form>
+
+    {% if projects %}
+        <div class="cards-grid">
+            {% for project in projects %}
+                <article class="card project-card">
+                    {% if project.cover_image %}
+                        <div class="project-thumb">
+                            <img src="{{ project.cover_image.url }}" alt="{{ project.title }}" />
+                        </div>
+                    {% else %}
+                        <div class="project-thumb project-thumb-placeholder">
+                            <span>{{ project.get_course_area_display }}</span>
+                        </div>
+                    {% endif %}
+                    <div class="project-card-body">
+                        <span class="badge badge-info">{{ project.get_course_area_display }}</span>
+                        <span class="badge badge-neutral">{{ project.get_status_display }}</span>
+                        <h3><a href="{{ project.get_absolute_url }}">{{ project.title }}</a></h3>
+                        <p class="muted">
+                            {% if project.ai_summary %}{{ project.ai_summary|truncatewords:25 }}
+                            {% else %}{{ project.description|truncatewords:25 }}{% endif %}
+                        </p>
+                        <div class="project-meta">
+                            <a href="{% url 'projects:portfolio' project.trainee.pk %}" class="trainee-link">
+                                {% if project.trainee.profile_photo %}
+                                    <img src="{{ project.trainee.profile_photo.url }}" class="avatar-xs" alt="" />
+                                {% endif %}
+                                {{ project.trainee.get_full_name }}
+                            </a>
+                            {% if project.average_rating %}
+                                <span class="star-rating">★ {{ project.average_rating }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+        {% if is_paginated %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&course={{ selected_course }}" class="btn btn-outline">← Prev</a>{% endif %}
+                <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&q={{ q }}&course={{ selected_course }}" class="btn btn-outline">Next →</a>{% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="empty-state">
+            <p>No projects found. Be the first to showcase your work!</p>
+            {% if user.is_authenticated and user.user_type == 'student' %}
+                <a href="{% url 'projects:create' %}" class="btn btn-primary">Add Your Project</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

@@ -5,62 +5,103 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}VETA Connect{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <header class="navbar">
+    <header class="navbar" id="navbar">
         <div class="container nav-inner">
-            <a href="/" class="brand">VETA Connect</a>
+            <a href="/" class="brand">
+                <span class="brand-dot"></span>
+                VETA Connect
+            </a>
             <nav class="nav-links" id="nav-links">
                 <a href="/" class="{% if request.path == '/' %}active{% endif %}">Home</a>
-                <a href="/opportunities/" class="{% if request.path == '/opportunities/' %}active{% endif %}">Opportunities</a>
-                <a href="/services/" class="{% if request.path == '/services/' %}active{% endif %}">Freelance</a>
-                <a href="/services/ai-support/" class="{% if request.path == '/services/ai-support/' %}active{% endif %}">AI Support</a>
-                <a href="/mentorship/" class="{% if request.path == '/mentorship/' %}active{% endif %}">Mentors</a>
-                <a href="/scholarships/" class="{% if request.path == '/scholarships/' %}active{% endif %}">Scholarships</a>
+                <a href="/projects/" class="{% if '/projects/' in request.path %}active{% endif %}">Showcase</a>
+                <a href="/opportunities/" class="{% if '/opportunities/' in request.path %}active{% endif %}">Opportunities</a>
+                <a href="/services/" class="{% if '/services/' in request.path %}active{% endif %}">Freelance</a>
+                <a href="/mentorship/" class="{% if '/mentorship/' in request.path %}active{% endif %}">Mentors</a>
+                <a href="/scholarships/" class="{% if '/scholarships/' in request.path %}active{% endif %}">Scholarships</a>
+                <a href="/projects/leaderboard/" class="{% if request.path == '/projects/leaderboard/' %}active{% endif %}">🏆 Top Talent</a>
+                <span class="nav-sep"></span>
                 {% if user.is_authenticated %}
-                    <a href="/accounts/dashboard/" class="{% if request.path == '/accounts/dashboard/' %}active{% endif %}">Dashboard</a>
+                    {% if user.is_trainer %}
+                        <a href="/projects/trainer-panel/" class="{% if '/trainer-panel/' in request.path %}active{% endif %}">Trainer Panel</a>
+                    {% endif %}
+                    <a href="/accounts/dashboard/" class="{% if '/dashboard/' in request.path %}active{% endif %}">Dashboard</a>
                     <a href="/accounts/logout/">Logout</a>
                 {% else %}
-                    <a href="/accounts/login/" class="{% if request.path == '/accounts/login/' %}active{% endif %}">Login</a>
-                    <a href="/accounts/register/" class="btn btn-primary {% if request.path == '/accounts/register/' %}active{% endif %}">Register</a>
+                    <a href="/accounts/login/" class="{% if '/login/' in request.path %}active{% endif %}">Login</a>
+                    <a href="/accounts/register/" class="btn btn-primary btn-sm">Register free</a>
                 {% endif %}
             </nav>
-            <button class="nav-toggle" id="nav-toggle">Menu</button>
+            <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
         </div>
     </header>
 
+    <div class="messages-wrap" id="messages-wrap">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="msg msg-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
     <main>
-        <div class="messages-wrap">
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="msg msg-{{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        </div>
         {% block content %}{% endblock %}
     </main>
 
     <footer class="footer">
-        <div class="container footer-grid">
-            <div>
-                <h3>VETA Connect</h3>
-                <p>Connecting TVET students to opportunities, mentors, and scholarships for skills-driven transformation.</p>
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-brand">
+                        <span class="footer-brand-dot"></span>
+                        VETA Connect
+                    </div>
+                    <p class="footer-desc">Empowering TVET learners across Kenya with tools, opportunities, mentors, and recognition they deserve.</p>
+                    <div class="footer-social">
+                        <a href="#" class="footer-social-btn" aria-label="Twitter/X">𝕏</a>
+                        <a href="#" class="footer-social-btn" aria-label="LinkedIn">in</a>
+                        <a href="#" class="footer-social-btn" aria-label="Facebook">f</a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Platform</h4>
+                    <a href="/projects/">Project Showcase</a>
+                    <a href="/projects/leaderboard/">Top Talent</a>
+                    <a href="/opportunities/">Opportunities</a>
+                    <a href="/services/">Freelance Services</a>
+                    <a href="/services/ai-support/">AI Support</a>
+                </div>
+                <div class="footer-col">
+                    <h4>For Trainees</h4>
+                    <a href="/mentorship/">Find a Mentor</a>
+                    <a href="/scholarships/">Scholarships</a>
+                    <a href="/accounts/register/">Create Profile</a>
+                    <a href="/accounts/dashboard/">Dashboard</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Support</h4>
+                    <a href="#">About VETA Connect</a>
+                    <a href="#">Help Centre</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Use</a>
+                </div>
             </div>
-            <div>
-                <h4>Explore</h4>
-                <a href="/opportunities/">Opportunities</a>
-                <a href="/services/">Freelance</a>
-                <a href="/mentorship/">Mentors</a>
-                <a href="/scholarships/">Scholarships</a>
-            </div>
-            <div>
-                <h4>Support</h4>
-                <p>Email: support@veta-connect.example.com</p>
-                <p>Phone: +254 700 000 000</p>
+            <div class="footer-bottom">
+                <span>© 2026 VETA Connect. All rights reserved.</span>
+                <span>Powered by Kenya TVET Authority</span>
             </div>
         </div>
     </footer>
+
     <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_scripts %}{% endblock %}
 </body>
 </html>

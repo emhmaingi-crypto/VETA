@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}Trainer Panel | VETA Connect{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1>Trainer Panel</h1>
+            <p class="muted">Review trainee projects, submit evaluations, and award recognition badges.</p>
+        </div>
+        <a href="{% url 'projects:leaderboard' %}" class="btn btn-outline">View Leaderboard</a>
+    </div>
+
+    <section class="section">
+        <h2>Trainees with Projects</h2>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Trainee</th>
+                        <th>Institution</th>
+                        <th>Course</th>
+                        <th>Projects</th>
+                        <th>Evaluations</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for trainee in trainees %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'projects:portfolio' trainee.pk %}">
+                                    <strong>{{ trainee.get_full_name }}</strong>
+                                </a>
+                            </td>
+                            <td>{{ trainee.institution|default:'-' }}</td>
+                            <td>{{ trainee.course|default:'-' }}</td>
+                            <td>{{ trainee.project_count }}</td>
+                            <td>{{ trainee.eval_count }}</td>
+                            <td>
+                                <a href="{% url 'projects:portfolio' trainee.pk %}" class="btn-sm btn-outline">View Portfolio</a>
+                                <a href="{% url 'projects:award_badge' trainee.pk %}" class="btn-sm btn-outline">Award Badge</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="6" class="muted">No trainees with projects yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    {% if recent_evaluations %}
+        <section class="section">
+            <h2>Your Recent Evaluations</h2>
+            <div class="compact-list-group">
+                {% for ev in recent_evaluations %}
+                    <div class="compact-item">
+                        <div>
+                            <strong>{{ ev.trainee.get_full_name }}</strong>
+                            {% if ev.project %}: <a href="{{ ev.project.get_absolute_url }}">{{ ev.project.title }}</a>{% endif %}
+                        </div>
+                        <span class="badge badge-accent">★ {{ ev.rating }}/5</span>
+                        <span class="muted">{{ ev.created_at|date:"M d, Y" }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+</div>
+{% endblock %}

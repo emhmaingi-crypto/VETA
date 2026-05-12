@@ -1,102 +1,291 @@
 {% extends 'base.html' %}
-{% block title %}Home | VETA Connect{% endblock %}
+{% block title %}Home | VETA Connect: Kenya's TVET Platform{% endblock %}
 {% block content %}
+
+<!-- ═══════════════ HERO ═══════════════ -->
 <section class="hero">
+    <div class="hero-bg"></div>
     <div class="container hero-grid">
-        <div class="hero-copy">
-            <span class="eyebrow">2026 TVET Fair Theme</span>
-            <h1>Transforming Tomorrow Today</h1>
-            <p>VETA Connect empowers TVET learners with opportunities, mentorship, and scholarships. Companies and individuals can find skilled graduates and post freelance projects.</p>
+        <!-- LEFT: copy -->
+        <div class="hero-copy" data-reveal>
+            <div class="hero-eyebrow">
+                <span class="hero-eyebrow-dot"></span>
+                2026 TVET Transformation Platform
+            </div>
+            <h1>Empowering Kenya's <em>Technical Talent</em></h1>
+            <p>VETA Connect connects TVET learners to opportunities, mentors, scholarships, and industry partners. Powered by AI tools built for the future of work.</p>
             <div class="hero-actions">
-                <a href="/accounts/register/" class="btn btn-primary">Start Your Journey</a>
-                <a href="/opportunities/" class="btn btn-outline">Browse Opportunities</a>
-                <a href="/services/ai-support/" class="btn btn-outline">AI Tech Support</a>
+                <a href="/accounts/register/" class="btn btn-primary btn-lg">Start for free</a>
+                <a href="/projects/" class="btn btn-outline btn-lg">Browse Showcase</a>
+                <a href="/projects/leaderboard/" class="btn btn-outline btn-lg">🏆 Top Talent</a>
+            </div>
+            <div class="hero-trust">
+                <div class="hero-avatars">
+                    <span>KM</span><span>AO</span><span>NW</span><span>JK</span><span>+</span>
+                </div>
+                <span>Joined by <strong>1,250+</strong> TVET learners</span>
             </div>
         </div>
-        <div class="hero-cards">
-            <article class="stat-card">
-                <span>40+</span>
-                <p>Active opportunities</p>
-            </article>
-            <article class="stat-card">
-                <span>25+</span>
-                <p>Industry mentors</p>
-            </article>
-            <article class="stat-card">
-                <span>18</span>
-                <p>Scholarships</p>
-            </article>
-            <article class="stat-card">
-                <span>100%</span>
-                <p>Skills-focused growth</p>
-            </article>
+        <!-- RIGHT: stat cards -->
+        <div class="hero-right" data-reveal data-reveal-delay="2">
+            <div class="hero-stat-grid">
+                <div class="hero-stat-card">
+                    <div class="stat-icon">🎓</div>
+                    <div class="stat-num">1,250</div>
+                    <div class="stat-label">Active learners</div>
+                </div>
+                <div class="hero-stat-card">
+                    <div class="stat-icon">🏢</div>
+                    <div class="stat-num">86</div>
+                    <div class="stat-label">Partner institutions</div>
+                </div>
+                <div class="hero-stat-card">
+                    <div class="stat-icon">💼</div>
+                    <div class="stat-num">40+</div>
+                    <div class="stat-label">Live opportunities</div>
+                </div>
+                <div class="hero-stat-card">
+                    <div class="stat-icon">🏆</div>
+                    <div class="stat-num">52</div>
+                    <div class="stat-label">Scholarship offers</div>
+                </div>
+            </div>
+            <div class="hero-feature-pill">
+                <div class="hero-feature-pill-icon">✨</div>
+                <div class="hero-feature-pill-text">
+                    <strong>AI-Powered Tools</strong>
+                    <span>Summarise projects, match opportunities, and get instant technical support</span>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
+<!-- ═══════════════ PARTNER STRIP ═══════════════ -->
+<div class="partner-strip">
+    <div class="container partner-inner">
+        <span class="partner-label">Trusted by</span>
+        <span class="partner-item">TVETA Kenya</span>
+        <span class="partner-item">Nairobi Technical</span>
+        <span class="partner-item">Kenya Industrial Training</span>
+        <span class="partner-item">Mombasa Polytechnic</span>
+        <span class="partner-item">Kisumu TTI</span>
+        <span class="partner-item">Nakuru Technical</span>
+    </div>
+</div>
+
+<!-- ═══════════════ HOW IT WORKS ═══════════════ -->
+<section class="section bg-white">
+    <div class="container">
+        <div class="section-heading-group center" data-reveal>
+            <span class="section-label">How it works</span>
+            <h2>From learner to opportunity in four steps</h2>
+            <p>A clear path from registration to recognition. No guesswork.</p>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card" data-reveal data-reveal-delay="1">
+                <div class="step-num">1</div>
+                <h3>Create your profile</h3>
+                <p>Register and build a rich skills profile with your course, qualifications, and links.</p>
+            </div>
+            <div class="step-card" data-reveal data-reveal-delay="2">
+                <div class="step-num">2</div>
+                <h3>Showcase your projects</h3>
+                <p>Upload images of your work, let AI expand your descriptions, and publish your portfolio.</p>
+            </div>
+            <div class="step-card" data-reveal data-reveal-delay="3">
+                <div class="step-num">3</div>
+                <h3>Get evaluated & rated</h3>
+                <p>Trainers review your projects, award badges, and recommend you for freelance or mentorship.</p>
+            </div>
+            <div class="step-card" data-reveal data-reveal-delay="4">
+                <div class="step-num">4</div>
+                <h3>Connect to opportunity</h3>
+                <p>Industry partners discover top graduates and invite them for freelance work, internships, and more.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ FEATURE CARDS ═══════════════ -->
 <section class="section bg-surface">
-    <div class="container split-block">
-        <div>
-            <h2>Student opportunity hub</h2>
-            <p>Discover jobs, internships, freelance projects, and growth pathways for TVET learners across Kenya.</p>
-            <ul class="feature-list">
-                <li>AI-powered opportunity matching</li>
-                <li>AI tech support for troubleshooting and system configuration</li>
-                <li>Freelance service requests and project proposals</li>
-                <li>Mentor requests and guidance</li>
-                <li>Scholarship search by level</li>
+    <div class="container">
+        <div class="section-heading-group" data-reveal>
+            <span class="section-label">Platform features</span>
+            <h2>Everything a TVET learner needs</h2>
+            <p>Tools built specifically for Kenya's technical and vocational ecosystem.</p>
+        </div>
+        <div class="feature-cards">
+            <div class="feat-card" data-reveal data-reveal-delay="1">
+                <div class="feat-icon feat-icon-green">📂</div>
+                <h3>Project Showcase</h3>
+                <p>Capture images of your technical work, add descriptions, and publish a professional portfolio visible to industry.</p>
+                <a href="/projects/" class="feat-link">Browse showcase →</a>
+            </div>
+            <div class="feat-card" data-reveal data-reveal-delay="2">
+                <div class="feat-icon feat-icon-amber">⭐</div>
+                <h3>Trainer Evaluations</h3>
+                <p>Receive structured feedback on practical skills, creativity, and professionalism from certified trainers.</p>
+                <a href="/projects/leaderboard/" class="feat-link">See top talent →</a>
+            </div>
+            <div class="feat-card" data-reveal data-reveal-delay="3">
+                <div class="feat-icon feat-icon-blue">✨</div>
+                <h3>AI-Powered Tools</h3>
+                <p>Let AI summarise and expand your project descriptions, match you to jobs, and give technical troubleshooting support.</p>
+                <a href="/services/ai-support/" class="feat-link">Try AI support →</a>
+            </div>
+            <div class="feat-card" data-reveal data-reveal-delay="1">
+                <div class="feat-icon feat-icon-teal">💼</div>
+                <h3>Opportunities & Freelance</h3>
+                <p>Discover internships, jobs, and freelance projects. AI matches you with roles that fit your skills and course area.</p>
+                <a href="/opportunities/" class="feat-link">Browse opportunities →</a>
+            </div>
+            <div class="feat-card" data-reveal data-reveal-delay="2">
+                <div class="feat-icon feat-icon-purple">🤝</div>
+                <h3>Mentorship</h3>
+                <p>Request guidance from industry professionals who understand the TVET pathway and can open doors for you.</p>
+                <a href="/mentorship/" class="feat-link">Find a mentor →</a>
+            </div>
+            <div class="feat-card" data-reveal data-reveal-delay="3">
+                <div class="feat-icon feat-icon-pink">🎓</div>
+                <h3>Scholarships</h3>
+                <p>Search and apply for scholarships specifically curated for TVET learners at certificate, diploma, and craft levels.</p>
+                <a href="/scholarships/" class="feat-link">Explore scholarships →</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ STATS BANNER ═══════════════ -->
+<section class="section-sm bg-surface">
+    <div class="container" data-reveal>
+        <div class="stats-banner">
+            <div class="stat-block">
+                <strong>1,250</strong>
+                <span>Registered learners</span>
+            </div>
+            <div class="stat-block">
+                <strong>86</strong>
+                <span>Program partners</span>
+            </div>
+            <div class="stat-block">
+                <strong>52</strong>
+                <span>Scholarship offers</span>
+            </div>
+            <div class="stat-block">
+                <strong>40+</strong>
+                <span>Live opportunities</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ SPLIT SECTION ═══════════════ -->
+<section class="section bg-white">
+    <div class="container split-section">
+        <div data-reveal>
+            <span class="section-label">Why VETA Connect</span>
+            <h2>Your skills deserve to be seen</h2>
+            <p>We built a platform that puts TVET learners first, giving you the tools to showcase your work, earn recognition, and connect with people who value your craft.</p>
+            <ul class="checklist">
+                <li>AI summarises and expands your project descriptions</li>
+                <li>Trainers evaluate and recommend you for freelance work</li>
+                <li>Earn badges: Top Rated, Best Project, Star Graduate</li>
+                <li>One profile connects you to jobs, mentors, and scholarships</li>
+                <li>Industry partners browse the talent leaderboard</li>
+                <li>AI matches your profile to the right opportunities</li>
             </ul>
+            <div class="gap-row">
+                <a href="/accounts/register/" class="btn btn-primary">Create your profile</a>
+                <a href="/projects/" class="btn btn-outline">See live projects</a>
+            </div>
         </div>
-        <div class="highlight-card">
-            <h3>Your learning, your future</h3>
-            <p>Build your profile once and connect to opportunities that match your course, skills, and career goals.</p>
+        <div class="split-visual" data-reveal data-reveal-delay="2">
+            <div class="split-visual-inner">
+                <div class="split-mini-card">
+                    <div class="mini-icon">🔧</div>
+                    <strong>Electrical Wiring</strong>
+                    <span>Rated 4.9 ⭐</span>
+                </div>
+                <div class="split-mini-card">
+                    <div class="mini-icon">💻</div>
+                    <strong>ICT Project</strong>
+                    <span>AI Summary ✓</span>
+                </div>
+                <div class="split-mini-card">
+                    <div class="mini-icon">🏗️</div>
+                    <strong>Building Tech</strong>
+                    <span>Badge earned 🏆</span>
+                </div>
+                <div class="split-mini-card">
+                    <div class="mini-icon">⚙️</div>
+                    <strong>Automotive</strong>
+                    <span>Hired ✓</span>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
-<section class="section container cards-grid">
-    <article class="card">
-        <h3>TVET for global competitiveness</h3>
-        <p>Find opportunities that prepare you for regional and international markets.</p>
-    </article>
-    <article class="card">
-        <h3>Innovation & digitalization</h3>
-        <p>Showcase your skills in robotics, digital services, and commercialization pathways.</p>
-    </article>
-    <article class="card">
-        <h3>Inclusive transformation</h3>
-        <p>Access mentorship and funding even if you are from underrepresented communities.</p>
-    </article>
-    <article class="card">
-        <h3>Green and climate-smart futures</h3>
-        <p>Connect with green employers and sustainable TVET initiatives.</p>
-    </article>
-</section>
-
-<section class="section container stats-strip">
-    <div class="stat-block">
-        <strong>1,250</strong>
-        <span>Registered learners</span>
-    </div>
-    <div class="stat-block">
-        <strong>86</strong>
-        <span>Program partners</span>
-    </div>
-    <div class="stat-block">
-        <strong>52</strong>
-        <span>Scholarship offers</span>
-    </div>
-    <div class="stat-block">
-        <strong>98%</strong>
-        <span>Profile completion rate</span>
+<!-- ═══════════════ ROLE CARDS ═══════════════ -->
+<section class="section bg-surface">
+    <div class="container">
+        <div class="section-heading-group center" data-reveal>
+            <span class="section-label">Who is it for</span>
+            <h2>Built for everyone in the TVET ecosystem</h2>
+            <p>Whether you're learning, teaching, or hiring, VETA Connect has a place for you.</p>
+        </div>
+        <div class="role-grid">
+            <div class="role-card role-card-1" data-reveal data-reveal-delay="1">
+                <div class="role-emoji">🎓</div>
+                <h3>TVET Trainees</h3>
+                <p>Create a portfolio, get evaluated by trainers, earn badges, and connect to freelance work, internships, and scholarships.</p>
+                <a href="/accounts/register/" class="btn btn-primary">Join as trainee</a>
+            </div>
+            <div class="role-card role-card-2" data-reveal data-reveal-delay="2">
+                <div class="role-emoji">👨‍🏫</div>
+                <h3>Trainers & Evaluators</h3>
+                <p>Evaluate trainee projects, provide structured feedback, award recognition badges, and recommend top talent to industry.</p>
+                <a href="/accounts/register/" class="btn btn-outline">Join as trainer</a>
+            </div>
+            <div class="role-card role-card-3" data-reveal data-reveal-delay="3">
+                <div class="role-emoji">🏢</div>
+                <h3>Industry Partners</h3>
+                <p>Browse the talent leaderboard, post freelance projects, and discover pre-evaluated TVET graduates ready to work.</p>
+                <a href="/projects/leaderboard/" class="btn btn-outline">Browse talent</a>
+            </div>
+        </div>
     </div>
 </section>
 
-<section class="section container callout-card">
-    <div>
-        <h2>Ready to connect with TVET opportunity?</h2>
-        <p>Register, complete your profile, and explore career pathways designed for the 2026 TVET transformation.</p>
+<!-- ═══════════════ TESTIMONIAL ═══════════════ -->
+<section class="testimonial-section">
+    <div class="container testimonial-inner" data-reveal>
+        <p class="testimonial-text">"VETA Connect changed how I present my work. My trainer evaluated my electrical project, gave me a Top Rated badge, and within two weeks a company reached out for a freelance contract. I never thought my college project could open doors like this."</p>
+        <div class="testimonial-author">
+            <div class="testimonial-avatar">👩‍🔧</div>
+            <div class="testimonial-name">
+                <strong>Amina Omondi</strong>
+                <span>Electrical Engineering, Nairobi Technical Institute</span>
+            </div>
+        </div>
     </div>
-    <a href="/accounts/register/" class="btn btn-primary">Register now</a>
 </section>
+
+<!-- ═══════════════ CTA BANNER ═══════════════ -->
+<section class="section bg-surface">
+    <div class="container" data-reveal>
+        <div class="cta-banner">
+            <div>
+                <h2>Ready to launch your TVET career?</h2>
+                <p>Register free, complete your profile, and let VETA Connect work for you.</p>
+            </div>
+            <div class="cta-banner-actions">
+                <a href="/accounts/register/" class="btn btn-primary btn-lg">Get started free</a>
+                <a href="/projects/" class="btn btn-outline btn-lg">Explore projects</a>
+            </div>
+        </div>
+    </div>
+</section>
+
 {% endblock %}

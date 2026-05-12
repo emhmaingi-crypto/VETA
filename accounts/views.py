@@ -8,6 +8,7 @@ from opportunities.models import Application, Opportunity
 from mentorship.models import MentorshipRequest
 from scholarships.models import Scholarship
 from services.models import ServiceApplication
+from projects.models import Project, TrainerEvaluation, RecognitionBadge
 from .forms import StudentLoginForm, StudentProfileForm, StudentRegisterForm
 from .models import StudentUser
 
@@ -49,10 +50,19 @@ class DashboardView(LoginRequiredMixin, generic.TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        context['applications'] = Application.objects.filter(student=user).order_by('-created_at')[:5]
-        context['requests'] = MentorshipRequest.objects.filter(student=user).order_by('-created_at')[:5]
-        context['scholarships'] = Scholarship.objects.filter(is_active=True)[:4]
-        context['matched_opportunities'] = Opportunity.objects.filter(is_active=True)[:4]
-        context['service_applications'] = ServiceApplication.objects.filter(freelancer=user).select_related('listing')[:5]
+        if user.user_type == 'student':
+            context['applications'] = Application.objects.filter(student=user).order_by('-created_at')[:5]
+            context['requests'] = MentorshipRequest.objects.filter(student=user).order_by('-created_at')[:5]
+            context['scholarships'] = Scholarship.objects.filter(is_active=True)[:4]
+            context['matched_opportunities'] = Opportunity.objects.filter(is_active=True)[:4]
+            context['service_applications'] = ServiceApplication.objects.filter(freelancer=user).select_related('listing')[:5]
+            context['my_projects'] = Project.objects.filter(trainee=user).order_by('-created_at')[:5]
+            context['my_badges'] = RecognitionBadge.objects.filter(trainee=user).order_by('-awarded_at')[:6]
+            context['my_evaluations'] = TrainerEvaluation.objects.filter(trainee=user).select_related('trainer').order_by('-created_at')[:5]
+            context['avg_rating'] = user.average_rating
+        elif user.user_type == 'trainer':
+            context['recent_evaluations'] = TrainerEvaluation.objects.filter(trainer=user).select_related('trainee', 'project').order_by('-created_at')[:8]
+            context['badges_awarded'] = RecognitionBadge.objects.filter(awarded_by=user).select_related('trainee').order_by('-awarded_at')[:6]
+            context['pending_projects'] = Project.objects.filter(is_public=True).order_by('-created_at')[:6]
         context['profile_complete'] = user.profile_complete
         return context

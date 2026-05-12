@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% block title %}{{ project.title }} | VETA Connect{% endblock %}
+{% block content %}
+<div class="container project-detail">
+
+    <!-- breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="{% url 'projects:list' %}">Showcase</a> /
+        <a href="{% url 'projects:portfolio' project.trainee.pk %}">{{ project.trainee.get_full_name }}</a> /
+        {{ project.title }}
+    </nav>
+
+    <div class="detail-grid">
+        <!-- main content -->
+        <div class="detail-main">
+            <div class="detail-header">
+                <div>
+                    <h1>{{ project.title }}</h1>
+                    <div class="tag-row">
+                        <span class="badge badge-info">{{ project.get_course_area_display }}</span>
+                        <span class="badge badge-neutral">{{ project.get_status_display }}</span>
+                        {% if project.average_rating %}
+                            <span class="badge badge-accent">★ {{ project.average_rating }} / 5</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if user_is_owner %}
+                    <div class="detail-actions">
+                        <a href="{% url 'projects:edit' project.pk %}" class="btn btn-outline">Edit Project</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- image gallery -->
+            {% if project.images.all %}
+                <div class="image-gallery">
+                    {% for img in project.images.all %}
+                        <figure class="gallery-item">
+                            <img src="{{ img.image.url }}" alt="{{ img.caption|default:project.title }}" />
+                            {% if img.caption %}<figcaption>{{ img.caption }}</figcaption>{% endif %}
+                        </figure>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- description -->
+            <section class="content-section">
+                <h2>Project Description</h2>
+                <p>{{ project.description|linebreaksbr }}</p>
+            </section>
+
+            {% if project.ai_summary %}
+                <section class="content-section ai-box">
+                    <h3>🤖 AI Summary</h3>
+                    <p>{{ project.ai_summary }}</p>
+                </section>
+            {% endif %}
+
+            {% if project.ai_expanded %}
+                <section class="content-section ai-box">
+                    <h3>🤖 AI Enhanced Description</h3>
+                    <p>{{ project.ai_expanded|linebreaksbr }}</p>
+                </section>
+            {% endif %}
+
+            {% if project.technologies %}
+                <section class="content-section">
+                    <h3>Technologies & Tools</h3>
+                    <div class="skills-tags">
+                        {% for tech in project.technologies.split %}
+                            <span class="skill-tag">{{ tech|cut:"," }}</span>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+
+            <!-- AI assist buttons (owner only) -->
+            {% if user_is_owner %}
+                <section class="content-section">
+                    <h3>AI Writing Assistant</h3>
+                    <p class="muted">Let AI help you refine your project description for your portfolio.</p>
+                    <div class="btn-row">
+                        <form method="post" action="{% url 'projects:ai_assist' project.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="summarize" />
+                            <button type="submit" class="btn btn-outline">✦ Generate AI Summary</button>
+                        </form>
+                        <form method="post" action="{% url 'projects:ai_assist' project.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="expand" />
+                            <button type="submit" class="btn btn-outline">✦ Expand Description</button>
+                        </form>
+                    </div>
+                </section>
+            {% endif %}
+
+            <!-- evaluations -->
+            {% if evaluations %}
+                <section class="content-section">
+                    <h2>Trainer Evaluations</h2>
+                    {% for ev in evaluations %}
+                        <div class="eval-card">
+                            <div class="eval-header">
+                                <strong>{{ ev.trainer.get_full_name }}</strong>
+                                <span class="muted">{{ ev.trainer.trainer_title }}</span>
+                                <span class="badge badge-accent">★ {{ ev.rating }}/5 Overall</span>
+                                <span class="muted">{{ ev.created_at|date:"M d, Y" }}</span>
+                            </div>
+                            <div class="eval-criteria">
+                                <div><label>Practical Skills</label><div class="star-bar" style="--fill:{{ ev.practical_skills }}0%">{{ ev.practical_skills }}/5</div></div>
+                                <div><label>Theoretical Knowledge</label><div class="star-bar">{{ ev.theoretical_knowledge }}/5</div></div>
+                                <div><label>Creativity</label><div class="star-bar">{{ ev.creativity }}/5</div></div>
+                                <div><label>Professionalism</label><div class="star-bar">{{ ev.professionalism }}/5</div></div>
+                            </div>
+                            {% if ev.strengths %}
+                                <p><strong>Strengths:</strong> {{ ev.strengths }}</p>
+                            {% endif %}
+                            {% if ev.areas_for_improvement %}
+                                <p><strong>Areas for improvement:</strong> {{ ev.areas_for_improvement }}</p>
+                            {% endif %}
+                            <p><strong>Feedback:</strong> {{ ev.feedback }}</p>
+                            {% if ev.recommended_for_freelance %}
+                                <span class="badge badge-success">✓ Recommended for Freelance</span>
+                            {% endif %}
+                            {% if ev.recommended_for_mentorship %}
+                                <span class="badge badge-info">✓ Recommended for Mentorship</span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </section>
+            {% endif %}
+
+            {% if can_evaluate %}
+                <div class="cta-box">
+                    <h3>Evaluate this project</h3>
+                    <p>You haven't evaluated this project yet. Provide your assessment and feedback.</p>
+                    <a href="{% url 'projects:evaluate' project.pk %}" class="btn btn-primary">Submit Evaluation</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- sidebar -->
+        <aside class="detail-sidebar">
+            <div class="sidebar-card">
+                <h3>About the Trainee</h3>
+                <a href="{% url 'projects:portfolio' project.trainee.pk %}">
+                    {% if project.trainee.profile_photo %}
+                        <img src="{{ project.trainee.profile_photo.url }}" class="avatar-md" alt="" />
+                    {% endif %}
+                    <strong>{{ project.trainee.get_full_name }}</strong>
+                </a>
+                <p class="muted">{{ project.trainee.course }} · {{ project.trainee.get_level_display }}</p>
+                <p class="muted">{{ project.trainee.institution }}</p>
+                {% if project.trainee.average_rating %}
+                    <p>★ Avg Rating: <strong>{{ project.trainee.average_rating }}</strong></p>
+                {% endif %}
+                {% if project.trainee.skills %}
+                    <div class="skills-tags">
+                        {% for sk in project.trainee.skills.split %}
+                            <span class="skill-tag">{{ sk|cut:"," }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if project.trainee.is_available %}
+                    <span class="badge badge-success">Available for hire</span>
+                {% endif %}
+            </div>
+            <div class="sidebar-card">
+                <h3>Recognition</h3>
+                {% for badge in project.trainee.badges.all %}
+                    <div class="badge-item">
+                        <span class="badge-icon">🏅</span>
+                        <div>
+                            <strong>{{ badge.title }}</strong>
+                            <p class="muted small">{{ badge.description }}</p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="muted">No badges yet.</p>
+                {% endfor %}
+            </div>
+            <a href="{% url 'services:list' %}" class="btn btn-outline full-width">Request this Technician</a>
+        </aside>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block title %}{{ trainee.get_full_name }} Portfolio | VETA Connect{% endblock %}
+{% block content %}
+<div class="container portfolio-page">
+    <div class="portfolio-hero">
+        <div class="portfolio-identity">
+            {% if trainee.profile_photo %}
+                <img src="{{ trainee.profile_photo.url }}" class="avatar-lg" alt="{{ trainee.get_full_name }}" />
+            {% else %}
+                <div class="avatar-lg avatar-placeholder">{{ trainee.first_name|first }}{{ trainee.last_name|first }}</div>
+            {% endif %}
+            <div>
+                <h1>{{ trainee.get_full_name }}</h1>
+                <p class="muted">{{ trainee.course }} · {{ trainee.get_level_display }} · {{ trainee.institution }}</p>
+                <p class="muted">{{ trainee.county }}</p>
+                {% if avg_rating %}
+                    <div class="rating-display">
+                        <span class="star">★</span>
+                        <strong>{{ avg_rating }}</strong><span class="muted">/5 average rating</span>
+                    </div>
+                {% endif %}
+                <div class="tag-row">
+                    {% if trainee.is_available %}
+                        <span class="badge badge-success">Available for hire</span>
+                    {% endif %}
+                    {% for badge in badges %}
+                        <span class="badge badge-accent">🏅 {{ badge.title }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="portfolio-actions">
+            <a href="/services/" class="btn btn-primary">Request Services</a>
+            {% if user.is_authenticated and user.is_trainer %}
+                <a href="{% url 'projects:award_badge' trainee.pk %}" class="btn btn-outline">Award Badge</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if trainee.bio %}
+        <section class="content-section">
+            <h2>About</h2>
+            <p>{{ trainee.bio }}</p>
+        </section>
+    {% endif %}
+
+    {% if trainee.skills %}
+        <section class="content-section">
+            <h2>Skills</h2>
+            <div class="skills-tags">
+                {% for sk in trainee.skills.split %}
+                    <span class="skill-tag">{{ sk|cut:"," }}</span>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    <!-- Projects -->
+    <section class="content-section">
+        <h2>Projects ({{ projects|length }})</h2>
+        {% if projects %}
+            <div class="cards-grid">
+                {% for project in projects %}
+                    <article class="card project-card">
+                        {% if project.cover_image %}
+                            <div class="project-thumb">
+                                <img src="{{ project.cover_image.url }}" alt="{{ project.title }}" />
+                            </div>
+                        {% else %}
+                            <div class="project-thumb project-thumb-placeholder">
+                                <span>{{ project.get_course_area_display }}</span>
+                            </div>
+                        {% endif %}
+                        <div class="project-card-body">
+                            <span class="badge badge-info">{{ project.get_course_area_display }}</span>
+                            <h3><a href="{{ project.get_absolute_url }}">{{ project.title }}</a></h3>
+                            <p class="muted">
+                                {% if project.ai_summary %}{{ project.ai_summary|truncatewords:20 }}
+                                {% else %}{{ project.description|truncatewords:20 }}{% endif %}
+                            </p>
+                            {% if project.average_rating %}
+                                <span class="star-rating">★ {{ project.average_rating }}</span>
+                            {% endif %}
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="muted">No public projects yet.</p>
+        {% endif %}
+    </section>
+
+    <!-- Trainer Feedback -->
+    {% if evaluations %}
+        <section class="content-section">
+            <h2>Trainer Feedback</h2>
+            {% for ev in evaluations %}
+                <div class="eval-card">
+                    <div class="eval-header">
+                        <strong>{{ ev.trainer.get_full_name }}</strong>
+                        <span class="muted">{{ ev.trainer.trainer_title }} · {{ ev.trainer.institution }}</span>
+                        <span class="badge badge-accent">★ {{ ev.rating }}/5</span>
+                        <span class="muted">{{ ev.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    {% if ev.project %}<p class="muted">Re: <a href="{{ ev.project.get_absolute_url }}">{{ ev.project.title }}</a></p>{% endif %}
+                    <p>{{ ev.feedback }}</p>
+                    {% if ev.strengths %}<p><strong>Strengths:</strong> {{ ev.strengths }}</p>{% endif %}
+                    {% if ev.recommended_for_freelance %}
+                        <span class="badge badge-success">✓ Recommended for Freelance</span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </section>
+    {% endif %}
+
+    <!-- Links -->
+    <section class="content-section">
+        <div class="link-row">
+            {% if trainee.linkedin_url %}<a href="{{ trainee.linkedin_url }}" class="btn btn-outline" target="_blank" rel="noopener">LinkedIn</a>{% endif %}
+            {% if trainee.github_url %}<a href="{{ trainee.github_url }}" class="btn btn-outline" target="_blank" rel="noopener">GitHub</a>{% endif %}
+            {% if trainee.portfolio_url %}<a href="{{ trainee.portfolio_url }}" class="btn btn-outline" target="_blank" rel="noopener">Portfolio</a>{% endif %}
+            {% if trainee.cv %}<a href="{{ trainee.cv.url }}" class="btn btn-outline" target="_blank" rel="noopener">Download CV</a>{% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %}

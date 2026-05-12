@@ -1,9 +1,11 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import Avg
 
 
 USER_TYPES = [
     ('student', 'Student/Graduate'),
+    ('trainer', 'Trainer/Evaluator'),
     ('company', 'Company'),
     ('individual', 'Individual'),
 ]
@@ -15,11 +17,19 @@ LEVEL_CHOICES = [
     ('higher_diploma', 'Higher Diploma'),
 ]
 
+BADGE_TYPES = [
+    ('top_rated', 'Top Rated Trainee'),
+    ('best_project', 'Best Project'),
+    ('most_hired', 'Most Hired'),
+    ('star_graduate', 'Star Graduate'),
+    ('innovation', 'Innovation Award'),
+]
+
 
 class StudentUser(AbstractUser):
     user_type = models.CharField(max_length=20, choices=USER_TYPES, default='student')
 
-    # Student fields
+    # Student/Trainee fields
     bio = models.TextField(blank=True)
     profile_photo = models.ImageField(upload_to='profiles/', blank=True, null=True)
     institution = models.CharField(max_length=255, blank=True)
@@ -35,10 +45,34 @@ class StudentUser(AbstractUser):
     is_available = models.BooleanField(default=True)
     projects = models.TextField(blank=True, help_text='Describe your projects and achievements')
 
+    # Trainer fields
+    trainer_title = models.CharField(max_length=255, blank=True)
+    trainer_department = models.CharField(max_length=255, blank=True)
+    trainer_expertise = models.TextField(blank=True, help_text='Comma-separated expertise areas')
+    trainer_years_experience = models.PositiveSmallIntegerField(blank=True, null=True)
+
     # Company/Individual fields
     company_name = models.CharField(max_length=255, blank=True)
     company_website = models.URLField(blank=True)
     company_description = models.TextField(blank=True)
+
+    @property
+    def is_trainer(self):
+        return self.user_type == 'trainer'
+
+    @property
+    def average_rating(self):
+        """Aggregate rating from service ratings + trainer evaluations."""
+        from services.models import ServiceRating
+        from projects.models import TrainerEvaluation
+        service_avg = ServiceRating.objects.filter(
+            application__freelancer=self
+        ).aggregate(avg=Avg('rating'))['avg'] or 0
+        eval_avg = TrainerEvaluation.objects.filter(
+            trainee=self
+        ).aggregate(avg=Avg('rating'))['avg'] or 0
+        scores = [s for s in [service_avg, eval_avg] if s]
+        return round(sum(scores) / len(scores), 1) if scores else 0
 
     @property
     def profile_complete(self):
@@ -51,6 +85,15 @@ class StudentUser(AbstractUser):
                 self.course,
                 self.level,
                 self.skills,
+            ]
+            return all(required)
+        elif self.user_type == 'trainer':
+            required = [
+                self.first_name,
+                self.last_name,
+                self.email,
+                self.institution,
+                self.trainer_title,
             ]
             return all(required)
         elif self.user_type in ['company', 'individual']:

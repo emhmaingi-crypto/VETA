@@ -4,62 +4,131 @@
 <div class="container dashboard-grid">
     <div class="dashboard-card">
         <h2>Welcome back, {{ user.first_name }}!</h2>
-        <p>Your profile is {% if profile_complete %}<span class="badge badge-success">complete</span>{% else %}<span class="badge badge-warning">incomplete</span>{% endif %}. Keep building your skills.</p>
-        <div class="stats-grid">
-            <div>
-                <strong>{{ applications.count }}</strong>
-                <p>Applications</p>
-            </div>
-            <div>
-                <strong>{{ requests.count }}</strong>
-                <p>Mentorship requests</p>
-            </div>
-            <div>
-                <strong>{{ service_applications.count }}</strong>
-                <p>Freelance proposals</p>
-            </div>
-            <div>
-                <strong>{{ scholarships|length }}</strong>
-                <p>Scholarship options</p>
-            </div>
-        </div>
-        <div class="dashboard-actions">
-            <a href="/opportunities/" class="btn btn-primary">Browse opportunities</a>
-            <a href="/services/" class="btn btn-outline">Browse freelance services</a>
-        </div>
-    </div>
-    <div class="dashboard-card">
-        <h3>Recent applications</h3>
-        {% if applications %}
-            <ul class="compact-list">
-                {% for application in applications %}
-                    <li>{{ application.opportunity.title }} — <strong>{{ application.status|title }}</strong></li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>No recent applications yet.</p>
-        {% endif %}
-        <h3>Recent mentor requests</h3>
-        {% if requests %}
-            <ul class="compact-list">
-                {% for request in requests %}
-                    <li>{{ request.mentor.name }} — <strong>{{ request.status|title }}</strong></li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>No mentorship requests yet.</p>
-        {% endif %}
+        <p>Your profile is {% if profile_complete %}<span class="badge badge-success">complete</span>{% else %}<span class="badge badge-warning">incomplete - <a href="/accounts/profile/edit/">update now</a></span>{% endif %}</p>
 
-        <h3>Recent freelance proposals</h3>
-        {% if service_applications %}
-            <ul class="compact-list">
-                {% for application in service_applications %}
-                    <li>{{ application.listing.title }} — <strong>{{ application.status|title }}</strong></li>
-                {% endfor %}
-            </ul>
+        {% if user.user_type == 'student' %}
+            <div class="stats-grid">
+                <div><strong>{{ applications.count }}</strong><p>Applications</p></div>
+                <div><strong>{{ requests.count }}</strong><p>Mentorship requests</p></div>
+                <div><strong>{{ service_applications.count }}</strong><p>Freelance proposals</p></div>
+                <div><strong>{{ my_projects.count }}</strong><p>Projects</p></div>
+                {% if avg_rating %}
+                    <div><strong>★ {{ avg_rating }}</strong><p>Avg rating</p></div>
+                {% endif %}
+            </div>
+            <div class="dashboard-actions">
+                <a href="/projects/add/" class="btn btn-primary">+ Add Project</a>
+                <a href="/opportunities/" class="btn btn-outline">Browse Opportunities</a>
+                <a href="/services/" class="btn btn-outline">Browse Freelance</a>
+            </div>
+
+            {% if my_badges %}
+                <div class="badge-strip">
+                    {% for badge in my_badges %}
+                        <span class="badge badge-accent" title="{{ badge.description }}">🏅 {{ badge.title }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+        {% elif user.user_type == 'trainer' %}
+            <div class="stats-grid">
+                <div><strong>{{ recent_evaluations.count }}</strong><p>Evaluations given</p></div>
+                <div><strong>{{ badges_awarded.count }}</strong><p>Badges awarded</p></div>
+                <div><strong>{{ pending_projects.count }}</strong><p>Projects to review</p></div>
+            </div>
+            <div class="dashboard-actions">
+                <a href="/projects/trainer-panel/" class="btn btn-primary">Trainer Panel</a>
+                <a href="/projects/" class="btn btn-outline">View Showcase</a>
+                <a href="/projects/leaderboard/" class="btn btn-outline">Leaderboard</a>
+            </div>
         {% else %}
-            <p>No freelance proposals submitted yet.</p>
+            <div class="dashboard-actions">
+                <a href="/opportunities/" class="btn btn-primary">Browse Opportunities</a>
+                <a href="/services/" class="btn btn-outline">Browse Freelance</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="dashboard-card">
+        {% if user.user_type == 'student' %}
+            <h3>My Projects</h3>
+            {% if my_projects %}
+                <ul class="compact-list">
+                    {% for project in my_projects %}
+                        <li><a href="{{ project.get_absolute_url }}">{{ project.title }}</a>: <span class="muted">{{ project.get_status_display }}</span>
+                            {% if project.average_rating %}<span class="badge badge-accent">★ {{ project.average_rating }}</span>{% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="muted">No projects yet. <a href="/projects/add/">Add your first project</a>.</p>
+            {% endif %}
+
+            <h3>Trainer Feedback</h3>
+            {% if my_evaluations %}
+                <ul class="compact-list">
+                    {% for ev in my_evaluations %}
+                        <li>{{ ev.trainer.get_full_name }}: <strong>★ {{ ev.rating }}/5</strong>
+                            {% if ev.recommended_for_freelance %}<span class="badge badge-success">Freelance-ready</span>{% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="muted">No trainer evaluations yet.</p>
+            {% endif %}
+
+            <h3>Recent Applications</h3>
+            {% if applications %}
+                <ul class="compact-list">
+                    {% for application in applications %}
+                        <li>{{ application.opportunity.title }}: <strong>{{ application.status|title }}</strong></li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="muted">No applications yet.</p>
+            {% endif %}
+
+            <h3>Freelance Proposals</h3>
+            {% if service_applications %}
+                <ul class="compact-list">
+                    {% for application in service_applications %}
+                        <li>{{ application.listing.title }}: <strong>{{ application.status|title }}</strong></li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="muted">No freelance proposals submitted yet.</p>
+            {% endif %}
+
+        {% elif user.user_type == 'trainer' %}
+            <h3>Recent Evaluations</h3>
+            {% if recent_evaluations %}
+                <ul class="compact-list">
+                    {% for ev in recent_evaluations %}
+                        <li>
+                            <a href="{% url 'projects:portfolio' ev.trainee.pk %}">{{ ev.trainee.get_full_name }}</a>
+                            {% if ev.project %}: {{ ev.project.title }}{% endif %}
+                            <strong class="badge badge-accent">★ {{ ev.rating }}/5</strong>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="muted">You haven't evaluated any trainees yet. <a href="/projects/trainer-panel/">Go to Trainer Panel</a>.</p>
+            {% endif %}
+
+            <h3>Projects Awaiting Review</h3>
+            {% if pending_projects %}
+                <ul class="compact-list">
+                    {% for project in pending_projects %}
+                        <li>
+                            <a href="{{ project.get_absolute_url }}">{{ project.title }}</a>
+                            <span class="muted">by {{ project.trainee.get_full_name }}</span>
+                            {% if not project.evaluations.exists %}<span class="badge badge-warning">Needs evaluation</span>{% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         {% endif %}
     </div>
 </div>
 {% endblock %}
+

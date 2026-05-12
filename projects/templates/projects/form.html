@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Project | VETA Connect{% endblock %}
+{% block content %}
+<div class="container form-page">
+    <h1>{{ action }} Project</h1>
+    <p class="muted">Showcase your work. You can add up to 10 project images and use AI to improve your description.</p>
+
+    <form method="post" enctype="multipart/form-data" class="form-card">
+        {% csrf_token %}
+        <h2>Project Details</h2>
+        {% for field in form %}
+            <div class="field-wrap {% if field.errors %}field-error{% endif %}">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<p class="help-text">{{ field.help_text }}</p>{% endif %}
+                {% for error in field.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+            </div>
+        {% endfor %}
+
+        <h2>Project Images</h2>
+        <p class="muted">Upload photos of your project: prototypes, screenshots, or finished work.</p>
+        {{ image_formset.management_form }}
+        <div class="image-formset">
+            {% for img_form in image_formset %}
+                <div class="image-form-row">
+                    {% for field in img_form %}
+                        <div class="field-wrap">
+                            <label>{{ field.label }}</label>
+                            {{ field }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save Project</button>
+            <a href="{% url 'projects:list' %}" class="btn btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

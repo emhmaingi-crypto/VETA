@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block title %}Recognition Leaderboard | VETA Connect{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1>🏆 Recognition Leaderboard</h1>
+            <p class="muted">Top-rated TVET trainees evaluated by trainers and industry partners.</p>
+        </div>
+    </div>
+
+    <div class="leaderboard-grid">
+        <!-- Top rated trainees -->
+        <section class="leaderboard-section">
+            <h2>Top Rated Trainees</h2>
+            <div class="leaderboard-list">
+                {% for trainee in top_trainees %}
+                    <div class="leaderboard-row rank-{{ forloop.counter }}">
+                        <span class="rank-num">
+                            {% if forloop.counter == 1 %}🥇
+                            {% elif forloop.counter == 2 %}🥈
+                            {% elif forloop.counter == 3 %}🥉
+                            {% else %}{{ forloop.counter }}{% endif %}
+                        </span>
+                        <a href="{% url 'projects:portfolio' trainee.pk %}">
+                            {% if trainee.profile_photo %}
+                                <img src="{{ trainee.profile_photo.url }}" class="avatar-sm" alt="" />
+                            {% else %}
+                                <div class="avatar-sm avatar-placeholder">{{ trainee.first_name|first }}{{ trainee.last_name|first }}</div>
+                            {% endif %}
+                            <div class="leaderboard-info">
+                                <strong>{{ trainee.get_full_name }}</strong>
+                                <span class="muted">{{ trainee.course }} · {{ trainee.institution }}</span>
+                            </div>
+                        </a>
+                        <div class="leaderboard-stats">
+                            <span class="star-rating">★ {{ trainee.avg_eval|floatformat:1 }}</span>
+                            <span class="muted">{{ trainee.eval_count }} evaluation{{ trainee.eval_count|pluralize }}</span>
+                            <span class="muted">{{ trainee.project_count }} project{{ trainee.project_count|pluralize }}</span>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="muted">No evaluations submitted yet. Trainers, start evaluating trainees!</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Badge holders -->
+        <section class="leaderboard-section">
+            <h2>Badge Leaders</h2>
+            <div class="leaderboard-list">
+                {% for trainee in badge_holders %}
+                    <div class="leaderboard-row">
+                        <span class="rank-num">{{ forloop.counter }}</span>
+                        <a href="{% url 'projects:portfolio' trainee.pk %}">
+                            {% if trainee.profile_photo %}
+                                <img src="{{ trainee.profile_photo.url }}" class="avatar-sm" alt="" />
+                            {% else %}
+                                <div class="avatar-sm avatar-placeholder">{{ trainee.first_name|first }}{{ trainee.last_name|first }}</div>
+                            {% endif %}
+                            <div class="leaderboard-info">
+                                <strong>{{ trainee.get_full_name }}</strong>
+                                <span class="muted">{{ trainee.badge_count }} badge{{ trainee.badge_count|pluralize }}</span>
+                            </div>
+                        </a>
+                    </div>
+                {% empty %}
+                    <p class="muted">No badges awarded yet.</p>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+
+    <!-- Recent Badges awarded -->
+    <section class="section">
+        <h2>Recently Awarded</h2>
+        <div class="cards-grid">
+            {% for badge in recent_badges %}
+                <div class="badge-award-card">
+                    <span class="badge-big-icon">🏅</span>
+                    <div>
+                        <strong>{{ badge.title }}</strong>
+                        <p><a href="{% url 'projects:portfolio' badge.trainee.pk %}">{{ badge.trainee.get_full_name }}</a></p>
+                        <p class="muted small">
+                            Awarded by {{ badge.awarded_by.get_full_name|default:'System' }} · {{ badge.awarded_at|date:"M d, Y" }}
+                        </p>
+                        {% if badge.description %}<p class="muted small">{{ badge.description }}</p>{% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <p class="muted">No recognition badges awarded yet.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <div class="section cta-box">
+        <div>
+            <h2>Are you a trainer?</h2>
+            <p>Evaluate trainees and help surface the best TVET talent in Kenya.</p>
+        </div>
+        {% if user.is_authenticated and user.is_trainer %}
+            <a href="{% url 'projects:trainer_panel' %}" class="btn btn-primary">Go to Trainer Panel</a>
+        {% else %}
+            <a href="{% url 'accounts:register' %}" class="btn btn-primary">Register as Trainer</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

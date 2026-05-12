@@ -4,36 +4,97 @@
 <div class="container profile-page">
     <div class="profile-card">
         <div class="profile-header">
-            <h1>{{ user.get_full_name }}</h1>
-            <p class="muted">{{ user.email }}</p>
+            {% if user.profile_photo %}
+                <img src="{{ user.profile_photo.url }}" class="avatar-lg" alt="{{ user.get_full_name }}" />
+            {% else %}
+                <div class="avatar-lg avatar-placeholder">{{ user.first_name|first }}{{ user.last_name|first }}</div>
+            {% endif %}
+            <div>
+                <h1>{{ user.get_full_name }}</h1>
+                <p class="muted">{{ user.email }}</p>
+                <span class="badge badge-neutral">{{ user.get_user_type_display }}</span>
+                {% if user.average_rating %}
+                    <span class="badge badge-accent">★ {{ user.average_rating }} avg rating</span>
+                {% endif %}
+            </div>
             <a href="/accounts/profile/edit/" class="btn btn-outline">Edit profile</a>
         </div>
+
         <div class="profile-grid">
-            <div>
-                <h3>Institution</h3>
-                <p>{{ user.institution|default:'Not set yet' }}</p>
-            </div>
-            <div>
-                <h3>Course</h3>
-                <p>{{ user.course|default:'Not set yet' }}</p>
-            </div>
-            <div>
-                <h3>Level</h3>
-                <p>{{ user.get_level_display|default:'Not set yet' }}</p>
-            </div>
-            <div>
-                <h3>Skills</h3>
-                <p>{{ user.skills|default:'Not set yet' }}</p>
-            </div>
-            <div class="wide-block">
-                <h3>About</h3>
-                <p>{{ user.bio|default:'Share your learning goals and ambitions.' }}</p>
-            </div>
+            {% if user.user_type == 'student' %}
+                <div><h3>Institution</h3><p>{{ user.institution|default:'Not set yet' }}</p></div>
+                <div><h3>Course</h3><p>{{ user.course|default:'Not set yet' }}</p></div>
+                <div><h3>Level</h3><p>{{ user.get_level_display|default:'Not set yet' }}</p></div>
+                <div><h3>County</h3><p>{{ user.county|default:'Not set yet' }}</p></div>
+                <div><h3>Graduation Year</h3><p>{{ user.graduation_year|default:'Not set yet' }}</p></div>
+                <div><h3>Availability</h3><p>{% if user.is_available %}<span class="badge badge-success">Available for hire</span>{% else %}<span class="badge badge-neutral">Not available</span>{% endif %}</p></div>
+                <div class="wide-block">
+                    <h3>Skills</h3>
+                    {% if user.skills %}
+                        <div class="skills-tags">
+                            {% for sk in user.skills.split %}
+                                <span class="skill-tag">{{ sk|cut:"," }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}<p class="muted">No skills listed yet.</p>{% endif %}
+                </div>
+                <div class="wide-block"><h3>About</h3><p>{{ user.bio|default:'Share your learning goals and ambitions.' }}</p></div>
+
+            {% elif user.user_type == 'trainer' %}
+                <div><h3>Title</h3><p>{{ user.trainer_title|default:'Not set yet' }}</p></div>
+                <div><h3>Department</h3><p>{{ user.trainer_department|default:'Not set yet' }}</p></div>
+                <div><h3>Institution</h3><p>{{ user.institution|default:'Not set yet' }}</p></div>
+                <div><h3>Years Experience</h3><p>{{ user.trainer_years_experience|default:'-' }}</p></div>
+                <div class="wide-block">
+                    <h3>Expertise Areas</h3>
+                    {% if user.trainer_expertise %}
+                        <div class="skills-tags">
+                            {% for ex in user.trainer_expertise.split %}
+                                <span class="skill-tag">{{ ex|cut:"," }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}<p class="muted">No expertise listed yet.</p>{% endif %}
+                </div>
+                <div class="wide-block"><h3>About</h3><p>{{ user.bio|default:'Tell trainees about your background.' }}</p></div>
+
+            {% elif user.user_type in 'company individual' %}
+                <div><h3>Company / Name</h3><p>{{ user.company_name|default:'Not set yet' }}</p></div>
+                <div><h3>Website</h3><p>{% if user.company_website %}<a href="{{ user.company_website }}">{{ user.company_website }}</a>{% else %}-{% endif %}</p></div>
+                <div class="wide-block"><h3>About</h3><p>{{ user.company_description|default:'Tell trainees about your organisation.' }}</p></div>
+            {% endif %}
+
             <div class="wide-block">
                 <h3>Links</h3>
-                <p><a href="{{ user.linkedin_url }}">LinkedIn</a> | <a href="{{ user.github_url }}">GitHub</a> | <a href="{{ user.portfolio_url }}">Portfolio</a></p>
+                <div class="link-row">
+                    {% if user.linkedin_url %}<a href="{{ user.linkedin_url }}" class="btn btn-outline" target="_blank" rel="noopener">LinkedIn</a>{% endif %}
+                    {% if user.github_url %}<a href="{{ user.github_url }}" class="btn btn-outline" target="_blank" rel="noopener">GitHub</a>{% endif %}
+                    {% if user.portfolio_url %}<a href="{{ user.portfolio_url }}" class="btn btn-outline" target="_blank" rel="noopener">Portfolio</a>{% endif %}
+                    {% if user.cv %}<a href="{{ user.cv.url }}" class="btn btn-outline" target="_blank" rel="noopener">Download CV</a>{% endif %}
+                </div>
             </div>
         </div>
+
+        {% if user.user_type == 'student' %}
+            <div class="profile-section">
+                <h2>My Projects</h2>
+                <a href="/projects/add/" class="btn btn-outline">+ Add Project</a>
+                <a href="{% url 'projects:portfolio' user.pk %}" class="btn btn-outline">View Public Portfolio</a>
+            </div>
+            {% if user.badges.exists %}
+                <div class="profile-section">
+                    <h2>Recognition</h2>
+                    <div class="badge-strip">
+                        {% for badge in user.badges.all %}
+                            <div class="badge-item">
+                                <span>🏅 {{ badge.title }}</span>
+                                <p class="muted small">{{ badge.description }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
     </div>
 </div>
 {% endblock %}
+

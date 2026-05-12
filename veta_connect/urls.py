@@ -8,6 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', TemplateView.as_view(template_name='home.html'), name='home'),
     path('accounts/', include('accounts.urls')),
+    path('projects/', include('projects.urls')),
     path('opportunities/', include('opportunities.urls')),
     path('mentorship/', include('mentorship.urls')),
     path('scholarships/', include('scholarships.urls')),
