@@ -1,28 +1,141 @@
 {% extends 'base.html' %}
-{% block title %}Register | VETA Connect{% endblock %}
+{% block title %}Create Account | VETA Connect{% endblock %}
+
 {% block content %}
-<div class="container auth-card">
-    <h1>Create your account</h1>
-    <p>Register as a TVET student, company, or individual to connect with opportunities and services.</p>
-    <form method="post" class="form-card">
-        {% csrf_token %}
-        {{ form.non_field_errors }}
-        <label>Account type</label>
-        {{ form.user_type }}
-        <label>Username</label>
-        {{ form.username }}
-        <label>First name</label>
-        {{ form.first_name }}
-        <label>Last name</label>
-        {{ form.last_name }}
-        <label>Email</label>
-        {{ form.email }}
-        <label>Password</label>
-        {{ form.password1 }}
-        <label>Confirm password</label>
-        {{ form.password2 }}
-        <button type="submit" class="btn btn-primary">Register</button>
-    </form>
-    <p class="small-text">Already have an account? <a href="/accounts/login/">Login</a>.</p>
+<div class="portal-wrap">
+
+    <!-- ── Left brand panel ── -->
+    <div class="portal-brand">
+        <div class="portal-brand-inner">
+            <a href="/" class="portal-logo">
+                <span class="portal-logo-dot"></span>
+                <span>VETA Connect</span>
+            </a>
+            <h1 class="portal-brand-title">Start your journey</h1>
+            <p class="portal-brand-sub">Join 1,250+ TVET learners, trainers, and industry partners already on Kenya's leading TVET platform.</p>
+            <ul class="portal-perks">
+                <li><span class="perk-icon">✅</span><span>Free to register, no credit card needed</span></li>
+                <li><span class="perk-icon">📂</span><span>Build a professional project portfolio</span></li>
+                <li><span class="perk-icon">✨</span><span>AI tools to summarise and match your skills</span></li>
+                <li><span class="perk-icon">🏆</span><span>Get evaluated and earn recognition badges</span></li>
+                <li><span class="perk-icon">💼</span><span>Discover internships, freelance, and scholarships</span></li>
+            </ul>
+            <div class="portal-stat-row">
+                <div class="portal-stat"><strong>1,250+</strong><span>Learners</span></div>
+                <div class="portal-stat"><strong>40+</strong><span>Opportunities</span></div>
+                <div class="portal-stat"><strong>52</strong><span>Scholarships</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Right form panel ── -->
+    <div class="portal-form-panel">
+        <div class="portal-form-inner" style="max-width:460px;">
+            <div class="portal-form-header">
+                <h2>Create your account</h2>
+                <p>Already have an account? <a href="/accounts/login/">Sign in</a></p>
+            </div>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="portal-error-alert">
+                    {% for error in form.non_field_errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="portal-field">
+                    <label for="id_user_type">Account type</label>
+                    <div class="portal-input-wrap">
+                        <span class="portal-input-icon">🎭</span>
+                        {{ form.user_type }}
+                    </div>
+                    {% if form.user_type.errors %}<p class="portal-field-error">{{ form.user_type.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div class="portal-field">
+                        <label for="id_first_name">First name</label>
+                        <div class="portal-input-wrap">
+                            <span class="portal-input-icon">✏️</span>
+                            {{ form.first_name }}
+                        </div>
+                        {% if form.first_name.errors %}<p class="portal-field-error">{{ form.first_name.errors.0 }}</p>{% endif %}
+                    </div>
+                    <div class="portal-field">
+                        <label for="id_last_name">Last name</label>
+                        <div class="portal-input-wrap">
+                            <span class="portal-input-icon">✏️</span>
+                            {{ form.last_name }}
+                        </div>
+                        {% if form.last_name.errors %}<p class="portal-field-error">{{ form.last_name.errors.0 }}</p>{% endif %}
+                    </div>
+                </div>
+
+                <div class="portal-field">
+                    <label for="id_username">Username</label>
+                    <div class="portal-input-wrap">
+                        <span class="portal-input-icon">👤</span>
+                        {{ form.username }}
+                    </div>
+                    {% if form.username.errors %}<p class="portal-field-error">{{ form.username.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="portal-field">
+                    <label for="id_email">Email address</label>
+                    <div class="portal-input-wrap">
+                        <span class="portal-input-icon">📧</span>
+                        {{ form.email }}
+                    </div>
+                    {% if form.email.errors %}<p class="portal-field-error">{{ form.email.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="portal-field">
+                    <label for="id_password1">Password</label>
+                    <div class="portal-input-wrap">
+                        <span class="portal-input-icon">🔒</span>
+                        {{ form.password1 }}
+                        <button type="button" class="portal-eye" id="eye-btn1" title="Show or hide password" onclick="togglePass('id_password1','eye-btn1')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                    {% if form.password1.errors %}<p class="portal-field-error">{{ form.password1.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="portal-field">
+                    <label for="id_password2">Confirm password</label>
+                    <div class="portal-input-wrap">
+                        <span class="portal-input-icon">🔒</span>
+                        {{ form.password2 }}
+                        <button type="button" class="portal-eye" id="eye-btn2" title="Show or hide password" onclick="togglePass('id_password2','eye-btn2')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                    {% if form.password2.errors %}<p class="portal-field-error">{{ form.password2.errors.0 }}</p>{% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-primary portal-submit" style="margin-top:0.5rem;">Create account</button>
+            </form>
+
+            <p class="portal-tos">By registering you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
+        </div>
+    </div>
+
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function togglePass(fieldId, btnId) {
+    var inp = document.getElementById(fieldId);
+    var btn = document.getElementById(btnId);
+    if (!inp) return;
+    var show = inp.type === 'password';
+    inp.type = show ? 'text' : 'password';
+    btn.style.color = show ? 'var(--brand)' : '';
+}
+</script>
 {% endblock %}
