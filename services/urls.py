@@ -8,5 +8,6 @@ urlpatterns = [
     path('ai-support/', views.AISupportView.as_view(), name='ai_support'),
     path('<int:pk>/', views.ServiceDetailView.as_view(), name='detail'),
     path('<int:pk>/apply/', views.ServiceApplyView.as_view(), name='apply'),
+    path('<int:pk>/ai-proposal/', views.ai_proposal, name='ai_proposal'),
     path('my-applications/', views.MyServiceApplicationsView.as_view(), name='my_applications'),
 ]

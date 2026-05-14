@@ -3,10 +3,13 @@ import json
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.views import generic
+from django.views.decorators.http import require_POST
 
 from anthropic import Anthropic
 
@@ -159,3 +162,56 @@ class MyServiceApplicationsView(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         return ServiceApplication.objects.filter(freelancer=self.request.user).select_related('listing').order_by('-created_at')
+
+
+@login_required
+@require_POST
+def ai_proposal(request, pk):
+    """AJAX: generate an AI freelance proposal for the given service listing."""
+    ai_key = settings.ANTHROPIC_API_KEY
+    if not ai_key:
+        return JsonResponse({'error': 'AI is not configured on this server.'}, status=503)
+
+    listing = get_object_or_404(ServiceListing, pk=pk, is_active=True)
+    user = request.user
+    extra_notes = request.POST.get('notes', '').strip()
+
+    profile_lines = [
+        f"Name: {user.get_full_name() or user.username}",
+        f"Skills: {user.skills or 'N/A'}",
+        f"Bio: {user.bio or 'N/A'}",
+        f"Course: {user.course or 'N/A'}",
+        f"Institution: {user.institution or 'N/A'}",
+    ]
+
+    prompt = (
+        'You are an expert freelance coach helping a TVET student write a winning proposal.\n\n'
+        f'Student profile:\n{chr(10).join(profile_lines)}\n\n'
+        f'Service request title: {listing.title}\n'
+        f'Category: {listing.get_category_display() if listing.category else "N/A"}\n'
+        f'Description: {listing.description}\n'
+        f'Skills required: {listing.skills_required or "Not specified"}\n'
+        f'Budget: {listing.budget_range or "Not specified"}\n'
+        f'Timeline: {listing.timeline or "Not specified"}\n'
+    )
+    if extra_notes:
+        prompt += f'\nAdditional notes from student: {extra_notes}\n'
+    prompt += (
+        '\nWrite a professional, concise freelance proposal (3 paragraphs) that:\n'
+        '- Demonstrates understanding of the client\'s needs\n'
+        '- Highlights the student\'s relevant skills and past work\n'
+        '- Proposes a clear approach and asks for next steps\n'
+        'Return only the proposal text, no labels or headings.'
+    )
+
+    try:
+        client = Anthropic(api_key=ai_key)
+        response = client.messages.create(
+            model='claude-sonnet-4-6',
+            max_tokens=600,
+            messages=[{'role': 'user', 'content': prompt}],
+        )
+        result = response.content[0].text.strip()
+        return JsonResponse({'result': result})
+    except Exception as exc:
+        return JsonResponse({'error': f'AI unavailable: {exc}'}, status=503)

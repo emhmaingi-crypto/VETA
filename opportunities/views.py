@@ -2,9 +2,12 @@ import json
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.views import generic
+from django.views.decorators.http import require_POST
 from anthropic import Anthropic
 from .forms import ApplicationForm, OpportunityForm
 from .models import Application, Opportunity, PartnerOrganisation
@@ -181,6 +184,62 @@ class AIMatchView(LoginRequiredMixin, generic.TemplateView):
 
         blocks.append('Output exactly: {"matches": [{"id": <id>, "score": <score>, "reason": "..."}]}')
         return '\n\n'.join(blocks)
+
+
+@login_required
+@require_POST
+def ai_cover_letter(request, pk):
+    """AJAX: generate an AI cover letter for the given opportunity."""
+    ai_key = settings.ANTHROPIC_API_KEY
+    if not ai_key:
+        return JsonResponse({'error': 'AI is not configured on this server.'}, status=503)
+
+    opportunity = get_object_or_404(Opportunity, pk=pk, is_active=True)
+    user = request.user
+    extra_notes = request.POST.get('notes', '').strip()
+
+    profile_lines = [
+        f"Name: {user.get_full_name() or user.username}",
+        f"Course: {user.course or 'N/A'}",
+        f"Level: {user.get_level_display() if user.level else 'N/A'}",
+        f"Skills: {user.skills or 'N/A'}",
+        f"Bio: {user.bio or 'N/A'}",
+        f"Institution: {user.institution or 'N/A'}",
+    ]
+
+    prompt = (
+        'You are an expert TVET career advisor helping a student write a compelling cover letter.\n\n'
+        f'Student profile:\n{chr(10).join(profile_lines)}\n\n'
+        f'Opportunity title: {opportunity.title}\n'
+        f'Organisation: {opportunity.partner.name}\n'
+        f'Type: {opportunity.get_type_display()}\n'
+        f'Requirements: {opportunity.requirements or opportunity.description}\n'
+        f'Skills required: {opportunity.skills_required or "Not specified"}\n'
+        f'Duration: {opportunity.duration or "Not specified"}\n'
+        f'Stipend: {opportunity.stipend or "Not specified"}\n'
+    )
+    if extra_notes:
+        prompt += f'\nAdditional notes from student: {extra_notes}\n'
+    prompt += (
+        '\nWrite a professional, concise cover letter (3-4 paragraphs) that:\n'
+        '- Opens with a strong introduction\n'
+        '- Highlights relevant skills and experience\n'
+        '- Explains why they are a strong fit for this specific opportunity\n'
+        '- Closes with a call to action\n'
+        'Return only the cover letter text, no subject line or labels.'
+    )
+
+    try:
+        client = Anthropic(api_key=ai_key)
+        response = client.messages.create(
+            model='claude-sonnet-4-6',
+            max_tokens=700,
+            messages=[{'role': 'user', 'content': prompt}],
+        )
+        result = response.content[0].text.strip()
+        return JsonResponse({'result': result})
+    except Exception as exc:
+        return JsonResponse({'error': f'AI unavailable: {exc}'}, status=503)
 
 
 class OpportunityCreateView(LoginRequiredMixin, generic.CreateView):
