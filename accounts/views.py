@@ -1,13 +1,18 @@
 import io
+import json
 import qrcode
 
+from anthropic import Anthropic
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views import generic
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 from opportunities.models import Application, Opportunity
 from mentorship.models import MentorshipRequest
 from scholarships.models import Scholarship
@@ -113,3 +118,73 @@ def qr_print_view(request, username):
         'public_profile_url': public_profile_url,
         'profile_url': qr_image_url,
     })
+
+
+# ── AI Profile Assistant ──────────────────────────────────────────────────────
+
+# Map of editable field names to human-readable labels
+_AI_FIELDS = {
+    'bio': 'Bio / About me',
+    'skills': 'Skills (comma-separated)',
+    'projects': 'Projects & achievements',
+    'company_description': 'Company / Organisation description',
+    'trainer_expertise': 'Trainer expertise areas',
+}
+
+# System prompt shared by all field assists
+_AI_SYSTEM = (
+    'You are an expert TVET career coach helping students, trainers, and companies '
+    'write compelling, professional profile content for a digital platform called VETA Connect. '
+    'Write concise, natural text suitable for the requested profile field. '
+    'Return ONLY the text for that field — no preamble, no quotation marks, no labels.'
+)
+
+
+@login_required
+@require_POST
+def profile_ai_assist(request):
+    """AJAX endpoint: given a field name and user prompt, return AI-generated text."""
+    ai_key = settings.ANTHROPIC_API_KEY
+    if not ai_key:
+        return JsonResponse({'error': 'AI is not configured on this server.'}, status=503)
+
+    field = request.POST.get('field', '').strip()
+    user_prompt = request.POST.get('prompt', '').strip()
+
+    if field not in _AI_FIELDS:
+        return JsonResponse({'error': 'Invalid field.'}, status=400)
+    if not user_prompt:
+        return JsonResponse({'error': 'Please describe what you want the AI to write.'}, status=400)
+
+    user = request.user
+    context_lines = [
+        f"Name: {user.get_full_name() or user.username}",
+        f"Role: {user.get_user_type_display()}",
+    ]
+    if user.institution:
+        context_lines.append(f"Institution: {user.institution}")
+    if user.course:
+        context_lines.append(f"Course: {user.course}")
+    if user.level:
+        context_lines.append(f"Level: {user.get_level_display()}")
+    if user.skills:
+        context_lines.append(f"Existing skills: {user.skills}")
+
+    full_prompt = (
+        f"Profile context:\n{chr(10).join(context_lines)}\n\n"
+        f"Field to write: {_AI_FIELDS[field]}\n\n"
+        f"User instruction: {user_prompt}"
+    )
+
+    try:
+        client = Anthropic(api_key=ai_key)
+        response = client.messages.create(
+            model='claude-sonnet-4-6',
+            max_tokens=500,
+            system=_AI_SYSTEM,
+            messages=[{'role': 'user', 'content': full_prompt}],
+        )
+        result = response.content[0].text.strip()
+        return JsonResponse({'result': result})
+    except Exception as exc:
+        return JsonResponse({'error': f'AI unavailable: {exc}'}, status=503)

@@ -14,4 +14,5 @@ urlpatterns = [
     path('profile/<str:username>/', views.public_profile_view, name='public_profile'),
     path('profile/<str:username>/qr/', views.profile_qr_view, name='profile_qr'),
     path('profile/<str:username>/qr/print/', views.qr_print_view, name='qr_print'),
+    path('ai-assist/', views.profile_ai_assist, name='ai_assist'),
 ]

@@ -6,7 +6,39 @@
     <p class="muted">
         Role: <strong>{{ user.get_user_type_display }}</strong>.
         Fill in all relevant fields to complete your profile and unlock more features.
+        Use the <strong>✨ AI</strong> button next to any text field to get AI-generated suggestions.
     </p>
+
+    <!-- AI Assistant Panel -->
+    <div class="ai-assist-panel" id="ai-panel" style="display:none;">
+        <div class="ai-assist-inner">
+            <div class="ai-assist-header">
+                <span>✨ AI Profile Assistant</span>
+                <button type="button" class="ai-close-btn" id="ai-close">✕</button>
+            </div>
+            <p class="ai-assist-field-label muted" id="ai-field-label"></p>
+            <textarea
+                id="ai-prompt-input"
+                class="ai-prompt-textarea"
+                rows="3"
+                placeholder="Describe what you want, e.g. 'I'm a software engineering student who loves web dev and mobile apps'"
+            ></textarea>
+            <div class="ai-assist-actions">
+                <button type="button" class="btn btn-primary" id="ai-submit-btn">Generate ✨</button>
+                <span class="ai-loading" id="ai-loading" style="display:none;">Thinking…</span>
+            </div>
+            <div id="ai-result-wrap" style="display:none;">
+                <p class="muted" style="margin-top:0.75rem;font-size:0.82rem;">AI suggestion — review and edit before applying:</p>
+                <div id="ai-result-text" class="ai-result-box"></div>
+                <div class="ai-assist-actions" style="margin-top:0.5rem;">
+                    <button type="button" class="btn btn-primary" id="ai-apply-btn">Apply to field</button>
+                    <button type="button" class="btn btn-outline" id="ai-retry-btn">Try again</button>
+                </div>
+            </div>
+            <p class="ai-error muted" id="ai-error" style="display:none;color:#c00;"></p>
+        </div>
+    </div>
+
     <form method="post" enctype="multipart/form-data" class="form-card">
         {% csrf_token %}
         {{ form.non_field_errors }}
@@ -19,7 +51,18 @@
                 {# hide irrelevant fields for company/individual #}
             {% else %}
                 <div class="field-wrap {% if field.errors %}field-error{% endif %}">
-                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    <div class="field-label-row">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {% if field.name in 'bio skills projects company_description trainer_expertise' %}
+                            <button
+                                type="button"
+                                class="btn-ai-assist"
+                                data-field="{{ field.name }}"
+                                data-label="{{ field.label }}"
+                                data-target="{{ field.id_for_label }}"
+                            >✨ AI</button>
+                        {% endif %}
+                    </div>
                     {{ field }}
                     {% if field.help_text %}<p class="help-text">{{ field.help_text }}</p>{% endif %}
                     {% for error in field.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
@@ -32,4 +75,101 @@
         </div>
     </form>
 </div>
+
+<script>
+(function () {
+    const panel = document.getElementById('ai-panel');
+    const closeBtn = document.getElementById('ai-close');
+    const fieldLabel = document.getElementById('ai-field-label');
+    const promptInput = document.getElementById('ai-prompt-input');
+    const submitBtn = document.getElementById('ai-submit-btn');
+    const loadingEl = document.getElementById('ai-loading');
+    const resultWrap = document.getElementById('ai-result-wrap');
+    const resultText = document.getElementById('ai-result-text');
+    const applyBtn = document.getElementById('ai-apply-btn');
+    const retryBtn = document.getElementById('ai-retry-btn');
+    const errorEl = document.getElementById('ai-error');
+
+    let activeField = null;
+    let activeTarget = null;
+    let lastResult = '';
+
+    document.querySelectorAll('.btn-ai-assist').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            activeField = btn.dataset.field;
+            activeTarget = document.getElementById(btn.dataset.target);
+            fieldLabel.textContent = 'Helping with: ' + btn.dataset.label;
+            promptInput.value = '';
+            resultWrap.style.display = 'none';
+            errorEl.style.display = 'none';
+            resultText.textContent = '';
+            panel.style.display = 'block';
+            promptInput.focus();
+            panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+
+    closeBtn.addEventListener('click', function () {
+        panel.style.display = 'none';
+    });
+
+    function getCsrf() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+
+    function runAI() {
+        const prompt = promptInput.value.trim();
+        if (!prompt) { promptInput.focus(); return; }
+        submitBtn.disabled = true;
+        loadingEl.style.display = 'inline';
+        resultWrap.style.display = 'none';
+        errorEl.style.display = 'none';
+
+        const body = new URLSearchParams();
+        body.append('field', activeField);
+        body.append('prompt', prompt);
+        body.append('csrfmiddlewaretoken', getCsrf());
+
+        fetch('{% url "accounts:ai_assist" %}', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCsrf() },
+            body: body,
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            loadingEl.style.display = 'none';
+            submitBtn.disabled = false;
+            if (data.error) {
+                errorEl.textContent = data.error;
+                errorEl.style.display = 'block';
+                return;
+            }
+            lastResult = data.result;
+            resultText.textContent = lastResult;
+            resultWrap.style.display = 'block';
+        })
+        .catch(function () {
+            loadingEl.style.display = 'none';
+            submitBtn.disabled = false;
+            errorEl.textContent = 'Network error. Please try again.';
+            errorEl.style.display = 'block';
+        });
+    }
+
+    submitBtn.addEventListener('click', runAI);
+    retryBtn.addEventListener('click', runAI);
+    promptInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) runAI();
+    });
+
+    applyBtn.addEventListener('click', function () {
+        if (activeTarget && lastResult) {
+            activeTarget.value = lastResult;
+            panel.style.display = 'none';
+            activeTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            activeTarget.focus();
+        }
+    });
+})();
+</script>
 {% endblock %}

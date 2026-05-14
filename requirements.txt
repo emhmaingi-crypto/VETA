@@ -4,3 +4,6 @@ whitenoise>=6.0
 python-dotenv>=1.0
 pillow>=10.0
 qrcode[pil]>=7.4
+gunicorn>=21.2
+dj-database-url>=2.1
+psycopg2-binary>=2.9

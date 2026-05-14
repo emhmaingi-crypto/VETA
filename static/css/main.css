@@ -676,7 +676,42 @@ button, input, textarea, select { font: inherit; }
 .form-card h2 { font-size: 1.1rem; margin: 2rem 0 1rem; padding-top: 2rem; border-top: 1px solid var(--border-soft); }
 .form-card h2:first-child { margin-top: 0; padding-top: 0; border-top: none; }
 .field-wrap { margin-bottom: 1.25rem; }
+.field-label-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem; }
+.field-label-row label { font-weight: 600; font-size: 0.88rem; color: var(--text-2); margin-bottom: 0; }
 .field-wrap label { display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem; color: var(--text-2); }
+.btn-ai-assist {
+    font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem;
+    border: 1.5px solid var(--brand); color: var(--brand); background: transparent;
+    border-radius: 20px; cursor: pointer; transition: background var(--dur), color var(--dur);
+    white-space: nowrap;
+}
+.btn-ai-assist:hover { background: var(--brand); color: #fff; }
+
+/* AI Assist panel */
+.ai-assist-panel {
+    background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+    border: 1.5px solid var(--brand);
+    border-radius: var(--radius-xl);
+    margin-bottom: 1.75rem;
+    box-shadow: 0 4px 20px rgba(10,124,79,0.10);
+}
+.ai-assist-inner { padding: 1.5rem; }
+.ai-assist-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem; font-weight: 700; font-size: 1rem; color: var(--brand); }
+.ai-close-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--muted); }
+.ai-assist-field-label { font-size: 0.82rem; margin-bottom: 0.75rem; }
+.ai-prompt-textarea {
+    width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border);
+    border-radius: var(--radius-md); font: inherit; font-size: 0.95rem; resize: vertical;
+    background: #fff;
+}
+.ai-prompt-textarea:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(10,124,79,0.12); }
+.ai-assist-actions { display: flex; gap: 0.75rem; align-items: center; margin-top: 0.75rem; flex-wrap: wrap; }
+.ai-loading { font-size: 0.85rem; color: var(--muted); font-style: italic; }
+.ai-result-box {
+    background: #fff; border: 1.5px solid var(--border-soft); border-radius: var(--radius-md);
+    padding: 0.9rem 1rem; font-size: 0.93rem; white-space: pre-wrap; line-height: 1.6; color: var(--text);
+    margin-top: 0.5rem;
+}
 .field-wrap input, .field-wrap textarea, .field-wrap select {
     width: 100%; padding: 0.8rem 1rem; border: 1.5px solid var(--border);
     border-radius: var(--radius-md); background: white; font: inherit; font-size: 0.95rem; color: var(--text);
