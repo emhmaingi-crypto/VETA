@@ -32,10 +32,20 @@ class RegisterView(generic.CreateView):
     success_url = reverse_lazy('accounts:dashboard')
 
     def form_valid(self, form):
-        response = super().form_valid(form)
-        login(self.request, self.object)
+        # Auto-generate a unique username from the email (before the @)
+        import re
+        user = form.save(commit=False)
+        base = re.sub(r'[^a-zA-Z0-9]', '', user.email.split('@')[0])[:20] or 'user'
+        username = base
+        counter = 1
+        while StudentUser.objects.filter(username=username).exists():
+            username = f'{base}{counter}'
+            counter += 1
+        user.username = username
+        user.save()
+        login(self.request, user)
         messages.success(self.request, 'Welcome to VETA Connect. Your profile is ready to update.')
-        return response
+        return redirect(self.success_url)
 
 
 def profile_view(request):

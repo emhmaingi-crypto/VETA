@@ -9,7 +9,13 @@ class StudentRegisterForm(UserCreationForm):
 
     class Meta:
         model = StudentUser
-        fields = ['username', 'first_name', 'last_name', 'email', 'user_type', 'password1', 'password2']
+        fields = ['first_name', 'last_name', 'email', 'user_type', 'password1', 'password2']
+
+    def clean_email(self):
+        email = self.cleaned_data['email'].strip().lower()
+        if StudentUser.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError('An account with this email already exists.')
+        return email
 
 
 class StudentProfileForm(forms.ModelForm):
