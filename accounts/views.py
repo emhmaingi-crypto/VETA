@@ -1,7 +1,11 @@
+import io
+import qrcode
+
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect, render
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views import generic
 from opportunities.models import Application, Opportunity
@@ -66,3 +70,46 @@ class DashboardView(LoginRequiredMixin, generic.TemplateView):
             context['pending_projects'] = Project.objects.filter(is_public=True).order_by('-created_at')[:6]
         context['profile_complete'] = user.profile_complete
         return context
+
+
+def public_profile_view(request, username):
+    """Publicly accessible profile page — used as the QR code landing page."""
+    profile_user = get_object_or_404(StudentUser, username=username)
+    return render(request, 'accounts/public_profile.html', {'profile_user': profile_user})
+
+
+def profile_qr_view(request, username):
+    """Return a QR code PNG that encodes the user's public profile URL."""
+    get_object_or_404(StudentUser, username=username)
+    profile_url = request.build_absolute_uri(
+        reverse_lazy('accounts:public_profile', kwargs={'username': username})
+    )
+    qr = qrcode.QRCode(
+        version=None,
+        error_correction=qrcode.constants.ERROR_CORRECT_M,
+        box_size=8,
+        border=4,
+    )
+    qr.add_data(profile_url)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color='black', back_color='white')
+    buffer = io.BytesIO()
+    img.save(buffer, format='PNG')
+    buffer.seek(0)
+    return HttpResponse(buffer, content_type='image/png')
+
+
+def qr_print_view(request, username):
+    """Render a print-friendly QR card page."""
+    profile_user = get_object_or_404(StudentUser, username=username)
+    public_profile_url = request.build_absolute_uri(
+        reverse_lazy('accounts:public_profile', kwargs={'username': username})
+    )
+    qr_image_url = request.build_absolute_uri(
+        reverse_lazy('accounts:profile_qr', kwargs={'username': username})
+    )
+    return render(request, 'accounts/qr_print.html', {
+        'profile_user': profile_user,
+        'public_profile_url': public_profile_url,
+        'profile_url': qr_image_url,
+    })

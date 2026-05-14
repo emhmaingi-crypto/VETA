@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block title %}{{ profile_user.get_full_name }} | VETA Connect{% endblock %}
+{% block content %}
+<div class="container profile-page">
+    <div class="profile-card">
+        <div class="profile-header">
+            {% if profile_user.profile_photo %}
+                <img src="{{ profile_user.profile_photo.url }}" class="avatar-lg" alt="{{ profile_user.get_full_name }}" />
+            {% else %}
+                <div class="avatar-lg avatar-placeholder">{{ profile_user.first_name|first }}{{ profile_user.last_name|first }}</div>
+            {% endif %}
+            <div>
+                <h1>{{ profile_user.get_full_name }}</h1>
+                <p class="muted">{{ profile_user.email }}</p>
+                <span class="badge badge-neutral">{{ profile_user.get_user_type_display }}</span>
+                {% if profile_user.average_rating %}
+                    <span class="badge badge-accent">★ {{ profile_user.average_rating }} avg rating</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="profile-grid">
+            {% if profile_user.user_type == 'student' %}
+                <div><h3>Institution</h3><p>{{ profile_user.institution|default:'—' }}</p></div>
+                <div><h3>Course</h3><p>{{ profile_user.course|default:'—' }}</p></div>
+                <div><h3>Level</h3><p>{{ profile_user.get_level_display|default:'—' }}</p></div>
+                <div><h3>County</h3><p>{{ profile_user.county|default:'—' }}</p></div>
+                <div><h3>Graduation Year</h3><p>{{ profile_user.graduation_year|default:'—' }}</p></div>
+                <div><h3>Availability</h3>
+                    <p>{% if profile_user.is_available %}
+                        <span class="badge badge-success">Available for hire</span>
+                    {% else %}
+                        <span class="badge badge-neutral">Not available</span>
+                    {% endif %}</p>
+                </div>
+                <div class="wide-block">
+                    <h3>Skills</h3>
+                    {% if profile_user.skills %}
+                        <div class="skills-tags">
+                            {% for sk in profile_user.skills.split %}
+                                <span class="skill-tag">{{ sk|cut:"," }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}<p class="muted">No skills listed.</p>{% endif %}
+                </div>
+                <div class="wide-block"><h3>About</h3><p>{{ profile_user.bio|default:'—' }}</p></div>
+
+            {% elif profile_user.user_type == 'trainer' %}
+                <div><h3>Title</h3><p>{{ profile_user.trainer_title|default:'—' }}</p></div>
+                <div><h3>Department</h3><p>{{ profile_user.trainer_department|default:'—' }}</p></div>
+                <div><h3>Institution</h3><p>{{ profile_user.institution|default:'—' }}</p></div>
+                <div><h3>Years Experience</h3><p>{{ profile_user.trainer_years_experience|default:'—' }}</p></div>
+                <div class="wide-block">
+                    <h3>Expertise Areas</h3>
+                    {% if profile_user.trainer_expertise %}
+                        <div class="skills-tags">
+                            {% for ex in profile_user.trainer_expertise.split %}
+                                <span class="skill-tag">{{ ex|cut:"," }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}<p class="muted">No expertise listed.</p>{% endif %}
+                </div>
+                <div class="wide-block"><h3>About</h3><p>{{ profile_user.bio|default:'—' }}</p></div>
+
+            {% elif profile_user.user_type in 'company individual' %}
+                <div><h3>Company / Name</h3><p>{{ profile_user.company_name|default:'—' }}</p></div>
+                <div><h3>Website</h3>
+                    <p>{% if profile_user.company_website %}<a href="{{ profile_user.company_website }}" target="_blank" rel="noopener">{{ profile_user.company_website }}</a>{% else %}—{% endif %}</p>
+                </div>
+                <div class="wide-block"><h3>About</h3><p>{{ profile_user.company_description|default:'—' }}</p></div>
+            {% endif %}
+
+            <div class="wide-block">
+                <h3>Links</h3>
+                <div class="link-row">
+                    {% if profile_user.linkedin_url %}<a href="{{ profile_user.linkedin_url }}" class="btn btn-outline" target="_blank" rel="noopener">LinkedIn</a>{% endif %}
+                    {% if profile_user.github_url %}<a href="{{ profile_user.github_url }}" class="btn btn-outline" target="_blank" rel="noopener">GitHub</a>{% endif %}
+                    {% if profile_user.portfolio_url %}<a href="{{ profile_user.portfolio_url }}" class="btn btn-outline" target="_blank" rel="noopener">Portfolio</a>{% endif %}
+                    {% if profile_user.cv %}<a href="{{ profile_user.cv.url }}" class="btn btn-outline" target="_blank" rel="noopener">Download CV</a>{% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% if profile_user.user_type == 'student' %}
+            <div class="profile-section">
+                <h2>Portfolio</h2>
+                <a href="{% url 'projects:portfolio' profile_user.pk %}" class="btn btn-outline">View Full Portfolio</a>
+            </div>
+            {% if profile_user.badges.exists %}
+                <div class="profile-section">
+                    <h2>Recognition</h2>
+                    <div class="badge-strip">
+                        {% for badge in profile_user.badges.all %}
+                            <div class="badge-item">
+                                <span>🏅 {{ badge.title }}</span>
+                                <p class="muted small">{{ badge.description }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -94,6 +94,38 @@
                 </div>
             {% endif %}
         {% endif %}
+
+        <!-- QR Code Section -->
+        <div class="profile-section qr-section">
+            <h2>My Profile QR Code</h2>
+            <p class="muted">Share this QR code at events or job fairs — anyone who scans it will see your public profile.</p>
+            <div class="qr-wrapper">
+                <img
+                    src="{% url 'accounts:profile_qr' user.username %}"
+                    alt="QR code for {{ user.get_full_name }}"
+                    class="qr-image"
+                    width="180"
+                    height="180"
+                />
+            </div>
+            <div class="link-row" style="margin-top:0.75rem;">
+                <a
+                    href="{% url 'accounts:profile_qr' user.username %}"
+                    download="{{ user.username }}_qr.png"
+                    class="btn btn-outline"
+                >Download QR Code</a>
+                <a
+                    href="{% url 'accounts:qr_print' user.username %}"
+                    class="btn btn-outline"
+                    target="_blank" rel="noopener"
+                >🖨 Print QR Card</a>
+                <a
+                    href="{% url 'accounts:public_profile' user.username %}"
+                    class="btn btn-outline"
+                    target="_blank" rel="noopener"
+                >Preview Public Profile</a>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

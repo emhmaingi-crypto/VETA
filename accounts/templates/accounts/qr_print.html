@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QR Card – {{ profile_user.get_full_name }} | VETA Connect</title>
+    <style>
+        /* ── Base ── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            color: #111;
+        }
+
+        /* ── Print controls (hidden when printing) ── */
+        .print-controls {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .btn {
+            padding: 0.55rem 1.25rem;
+            border-radius: 8px;
+            border: 1.5px solid #333;
+            background: #fff;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            color: #111;
+        }
+        .btn-primary { background: #111; color: #fff; border-color: #111; }
+
+        /* ── Card ── */
+        .qr-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 2.5rem 2rem 2rem;
+            width: 340px;
+            text-align: center;
+            border: 1.5px solid #ddd;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+        }
+        .brand {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #888;
+            margin-bottom: 1.2rem;
+        }
+        .brand span { color: #111; }
+
+        .avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 0.6rem;
+            display: block;
+        }
+        .avatar-placeholder {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: #111;
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.6rem;
+        }
+
+        .name { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.15rem; }
+        .role { font-size: 0.82rem; color: #666; margin-bottom: 0.1rem; }
+        .institution { font-size: 0.82rem; color: #888; margin-bottom: 1.4rem; }
+
+        .qr-img-wrap {
+            background: #fff;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 12px;
+            display: inline-block;
+            padding: 10px;
+            margin-bottom: 1.1rem;
+        }
+        .qr-img-wrap img {
+            display: block;
+            image-rendering: pixelated;
+        }
+
+        .scan-label {
+            font-size: 0.75rem;
+            color: #999;
+            margin-bottom: 0.4rem;
+        }
+        .profile-url {
+            font-size: 0.7rem;
+            color: #555;
+            word-break: break-all;
+            background: #f7f7f7;
+            border-radius: 6px;
+            padding: 0.35rem 0.6rem;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 1.2rem 0 0.9rem;
+        }
+
+        .footer-text {
+            font-size: 0.7rem;
+            color: #bbb;
+        }
+
+        /* ── Print styles ── */
+        @media print {
+            body { background: #fff; padding: 0; justify-content: flex-start; }
+            .print-controls { display: none; }
+            .qr-card {
+                box-shadow: none;
+                border: 1px solid #ccc;
+                margin: 0 auto;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="print-controls">
+        <button class="btn btn-primary" onclick="window.print()">🖨 Print QR Card</button>
+        <a href="{{ profile_url }}" download="{{ profile_user.username }}_qr.png" class="btn">Download PNG</a>
+        <a href="javascript:history.back()" class="btn">← Back</a>
+    </div>
+
+    <div class="qr-card">
+        <div class="brand"><span>VETA</span> Connect</div>
+
+        {% if profile_user.profile_photo %}
+            <img src="{{ profile_user.profile_photo.url }}" class="avatar" alt="{{ profile_user.get_full_name }}" />
+        {% else %}
+            <div class="avatar-placeholder">{{ profile_user.first_name|first }}{{ profile_user.last_name|first }}</div>
+        {% endif %}
+
+        <div class="name">{{ profile_user.get_full_name }}</div>
+        <div class="role">{{ profile_user.get_user_type_display }}{% if profile_user.course %} · {{ profile_user.course }}{% endif %}</div>
+        <div class="institution">{{ profile_user.institution|default:'' }}</div>
+
+        <div class="qr-img-wrap">
+            <img
+                src="{{ profile_url }}"
+                alt="QR code"
+                width="200"
+                height="200"
+            />
+        </div>
+
+        <div class="scan-label">Scan to view full profile</div>
+        <div class="profile-url">{{ public_profile_url }}</div>
+
+        <hr class="divider" />
+        <div class="footer-text">vetaconnect.co.ke &nbsp;·&nbsp; TVET Student Network</div>
+    </div>
+
+</body>
+</html>

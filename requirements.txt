@@ -3,3 +3,4 @@ anthropic>=0.100.0
 whitenoise>=6.0
 python-dotenv>=1.0
 pillow>=10.0
+qrcode[pil]>=7.4

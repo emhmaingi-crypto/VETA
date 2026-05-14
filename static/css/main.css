@@ -625,6 +625,9 @@ button, input, textarea, select { font: inherit; }
 .link-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
 .profile-section { margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-soft); }
 .profile-section h2 { margin-top: 0; }
+.qr-section { display: flex; flex-direction: column; align-items: flex-start; }
+.qr-wrapper { background: #fff; border: 1px solid var(--border-soft); border-radius: var(--radius-lg); padding: 0.75rem; display: inline-block; margin-top: 0.75rem; }
+.qr-image { display: block; image-rendering: pixelated; }
 .badge-strip { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
 .badge-item { display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.6rem 0; border-bottom: 1px solid var(--border-soft); }
 .badge-icon { font-size: 1.5rem; flex-shrink: 0; }

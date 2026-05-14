@@ -11,4 +11,7 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.ProfileEditView.as_view(), name='profile_edit'),
     path('dashboard/', views.DashboardView.as_view(), name='dashboard'),
+    path('profile/<str:username>/', views.public_profile_view, name='public_profile'),
+    path('profile/<str:username>/qr/', views.profile_qr_view, name='profile_qr'),
+    path('profile/<str:username>/qr/print/', views.qr_print_view, name='qr_print'),
 ]
