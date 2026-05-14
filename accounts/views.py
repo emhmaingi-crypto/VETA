@@ -19,6 +19,9 @@ from scholarships.models import Scholarship
 from services.models import ServiceApplication
 from projects.models import Project, TrainerEvaluation, RecognitionBadge
 from .forms import StudentLoginForm, StudentProfileForm, StudentRegisterForm
+
+# Re-export StudentLoginForm so urls.py can import it from views
+__all__ = ['StudentLoginForm']
 from .models import StudentUser
 
 

@@ -53,4 +53,21 @@ class StudentProfileForm(forms.ModelForm):
 
 
 class StudentLoginForm(AuthenticationForm):
-    username = forms.CharField(widget=forms.TextInput(attrs={'autofocus': True}))
+    username = forms.EmailField(
+        label='Email address',
+        widget=forms.EmailInput(attrs={'autofocus': True, 'placeholder': 'you@example.com'}),
+    )
+
+    def clean(self):
+        email = self.cleaned_data.get('username', '').strip().lower()
+        self.cleaned_data['username'] = email
+        # Look up the actual username for this email (case-insensitive)
+        from .models import StudentUser
+        try:
+            user = StudentUser.objects.get(email__iexact=email)
+            self.cleaned_data['username'] = user.username
+        except StudentUser.DoesNotExist:
+            pass
+        except StudentUser.MultipleObjectsReturned:
+            pass
+        return super().clean()
