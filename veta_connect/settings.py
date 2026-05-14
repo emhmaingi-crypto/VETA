@@ -10,7 +10,20 @@ except ImportError:
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('SECRET_KEY', get_random_secret_key())
+# SECRET_KEY: read from env var (required in production).
+# Locally, fall back to a stable key stored in .secret_key file so CSRF tokens
+# don't break on every dev-server restart.
+_env_secret = os.environ.get('SECRET_KEY', '')
+if _env_secret:
+    SECRET_KEY = _env_secret
+else:
+    _key_file = BASE_DIR / '.secret_key'
+    if _key_file.exists():
+        SECRET_KEY = _key_file.read_text().strip()
+    else:
+        SECRET_KEY = get_random_secret_key()
+        _key_file.write_text(SECRET_KEY)
+
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 # Build ALLOWED_HOSTS from env, always add Railway public domain if present

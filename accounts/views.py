@@ -48,6 +48,7 @@ class RegisterView(generic.CreateView):
         return redirect(self.success_url)
 
 
+@login_required
 def profile_view(request):
     user = request.user
     ctx = {'user': user}

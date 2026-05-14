@@ -8,10 +8,10 @@
 
         {% if user.user_type == 'student' %}
             <div class="stats-grid">
-                <div><strong>{{ applications.count }}</strong><p>Applications</p></div>
-                <div><strong>{{ requests.count }}</strong><p>Mentorship requests</p></div>
-                <div><strong>{{ service_applications.count }}</strong><p>Freelance proposals</p></div>
-                <div><strong>{{ my_projects.count }}</strong><p>Projects</p></div>
+                <div><strong>{{ applications|length }}</strong><p>Applications</p></div>
+                <div><strong>{{ requests|length }}</strong><p>Mentorship requests</p></div>
+                <div><strong>{{ service_applications|length }}</strong><p>Freelance proposals</p></div>
+                <div><strong>{{ my_projects|length }}</strong><p>Projects</p></div>
                 {% if avg_rating %}
                     <div><strong>★ {{ avg_rating }}</strong><p>Avg rating</p></div>
                 {% endif %}

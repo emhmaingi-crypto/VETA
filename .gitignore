@@ -9,3 +9,6 @@ staticfiles/
 *.log
 .vscode/
 .DS_Store
+.secret_key
+debug_login.py
+debug_login.bat
