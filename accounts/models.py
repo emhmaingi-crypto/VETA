@@ -45,6 +45,19 @@ class StudentUser(AbstractUser):
     is_available = models.BooleanField(default=True)
     projects = models.TextField(blank=True, help_text='Describe your projects and achievements')
 
+    # Extended student fields
+    phone_number = models.CharField(max_length=20, blank=True)
+    nationality = models.CharField(max_length=100, blank=True)
+    id_number = models.CharField(max_length=50, blank=True, help_text='National ID or student ID')
+    languages = models.CharField(max_length=255, blank=True, help_text='Languages spoken, comma-separated')
+    certifications = models.TextField(blank=True, help_text='List any certifications or short courses completed')
+    work_experience = models.TextField(blank=True, help_text='Brief work or attachment experience')
+    achievements = models.TextField(blank=True, help_text='Awards, competitions, or notable achievements')
+    hobbies = models.CharField(max_length=255, blank=True)
+    preferred_job_type = models.CharField(max_length=100, blank=True, help_text='e.g. Full-time, Part-time, Attachment')
+    expected_salary = models.CharField(max_length=100, blank=True, help_text='Expected salary or rate range')
+    references = models.TextField(blank=True, help_text='Name, title, and contact of a reference')
+
     # Trainer fields
     trainer_title = models.CharField(max_length=255, blank=True)
     trainer_department = models.CharField(max_length=255, blank=True)

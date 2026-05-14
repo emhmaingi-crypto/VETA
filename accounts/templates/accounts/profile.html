@@ -2,6 +2,8 @@
 {% block title %}Profile | VETA Connect{% endblock %}
 {% block content %}
 <div class="container profile-page">
+
+    {# ── Header card ── #}
     <div class="profile-card">
         <div class="profile-header">
             {% if user.profile_photo %}
@@ -9,62 +11,200 @@
             {% else %}
                 <div class="avatar-lg avatar-placeholder">{{ user.first_name|first }}{{ user.last_name|first }}</div>
             {% endif %}
-            <div>
+            <div class="profile-header-info">
                 <h1>{{ user.get_full_name }}</h1>
-                <p class="muted">{{ user.email }}</p>
-                <span class="badge badge-neutral">{{ user.get_user_type_display }}</span>
-                {% if user.average_rating %}
-                    <span class="badge badge-accent">★ {{ user.average_rating }} avg rating</span>
+                {% if user.user_type == 'student' %}
+                    <p class="muted">{{ user.course|default:'' }}{% if user.course and user.institution %} · {% endif %}{{ user.institution|default:'' }}</p>
+                {% elif user.user_type == 'trainer' %}
+                    <p class="muted">{{ user.trainer_title|default:'' }}{% if user.trainer_title and user.trainer_department %}, {% endif %}{{ user.trainer_department|default:'' }}</p>
+                {% else %}
+                    <p class="muted">{{ user.company_name|default:'' }}</p>
                 {% endif %}
+                <p class="muted" style="font-size:0.85rem;">{{ user.email }}{% if user.phone_number %} · {{ user.phone_number }}{% endif %}{% if user.county %} · {{ user.county }}{% endif %}</p>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.4rem;">
+                    <span class="badge badge-neutral">{{ user.get_user_type_display }}</span>
+                    {% if user.user_type == 'student' %}
+                        {% if user.is_available %}
+                            <span class="badge badge-success">Available for hire</span>
+                        {% else %}
+                            <span class="badge badge-neutral">Not available</span>
+                        {% endif %}
+                        {% if avg_rating %}
+                            <span class="badge badge-accent">&#9733; {{ avg_rating }} avg rating</span>
+                        {% endif %}
+                    {% endif %}
+                    {% if not profile_complete %}
+                        <span class="badge badge-warn">&#9888; Profile incomplete</span>
+                    {% else %}
+                        <span class="badge badge-success">&#10003; Profile complete</span>
+                    {% endif %}
+                </div>
             </div>
-            <a href="/accounts/profile/edit/" class="btn btn-outline">Edit profile</a>
+            <div class="profile-header-actions">
+                <a href="/accounts/profile/edit/" class="btn btn-primary">Edit profile</a>
+                <a href="{% url 'accounts:public_profile' user.username %}" class="btn btn-outline" target="_blank" rel="noopener">Preview public</a>
+            </div>
         </div>
 
-        <div class="profile-grid">
-            {% if user.user_type == 'student' %}
-                <div><h3>Institution</h3><p>{{ user.institution|default:'Not set yet' }}</p></div>
-                <div><h3>Course</h3><p>{{ user.course|default:'Not set yet' }}</p></div>
-                <div><h3>Level</h3><p>{{ user.get_level_display|default:'Not set yet' }}</p></div>
-                <div><h3>County</h3><p>{{ user.county|default:'Not set yet' }}</p></div>
-                <div><h3>Graduation Year</h3><p>{{ user.graduation_year|default:'Not set yet' }}</p></div>
-                <div><h3>Availability</h3><p>{% if user.is_available %}<span class="badge badge-success">Available for hire</span>{% else %}<span class="badge badge-neutral">Not available</span>{% endif %}</p></div>
-                <div class="wide-block">
-                    <h3>Skills</h3>
-                    {% if user.skills %}
-                        <div class="skills-tags">
-                            {% for sk in user.skills.split %}
-                                <span class="skill-tag">{{ sk|cut:"," }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}<p class="muted">No skills listed yet.</p>{% endif %}
-                </div>
-                <div class="wide-block"><h3>About</h3><p>{{ user.bio|default:'Share your learning goals and ambitions.' }}</p></div>
+        {# ── Quick stats ── #}
+        {% if user.user_type == 'student' %}
+        <div class="stat-row">
+            <div class="stat-card">
+                <span class="stat-num">{{ my_projects|length }}</span>
+                <span class="stat-label">Projects</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num">{{ my_badges|length }}</span>
+                <span class="stat-label">Badges</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num">{{ opp_apps|length }}</span>
+                <span class="stat-label">Job Applications</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num">{{ service_apps|length }}</span>
+                <span class="stat-label">Service Applications</span>
+            </div>
+        </div>
+        {% elif user.user_type == 'trainer' %}
+        <div class="stat-row">
+            <div class="stat-card">
+                <span class="stat-num">{{ evaluated_count }}</span>
+                <span class="stat-label">Trainees Evaluated</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num">{{ badges_awarded|length }}</span>
+                <span class="stat-label">Badges Awarded</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
 
-            {% elif user.user_type == 'trainer' %}
-                <div><h3>Title</h3><p>{{ user.trainer_title|default:'Not set yet' }}</p></div>
-                <div><h3>Department</h3><p>{{ user.trainer_department|default:'Not set yet' }}</p></div>
-                <div><h3>Institution</h3><p>{{ user.institution|default:'Not set yet' }}</p></div>
-                <div><h3>Years Experience</h3><p>{{ user.trainer_years_experience|default:'-' }}</p></div>
-                <div class="wide-block">
-                    <h3>Expertise Areas</h3>
-                    {% if user.trainer_expertise %}
-                        <div class="skills-tags">
-                            {% for ex in user.trainer_expertise.split %}
-                                <span class="skill-tag">{{ ex|cut:"," }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}<p class="muted">No expertise listed yet.</p>{% endif %}
-                </div>
-                <div class="wide-block"><h3>About</h3><p>{{ user.bio|default:'Tell trainees about your background.' }}</p></div>
+    {# ── Two-column grid ── #}
+    <div class="profile-columns">
 
-            {% elif user.user_type in 'company individual' %}
-                <div><h3>Company / Name</h3><p>{{ user.company_name|default:'Not set yet' }}</p></div>
-                <div><h3>Website</h3><p>{% if user.company_website %}<a href="{{ user.company_website }}">{{ user.company_website }}</a>{% else %}-{% endif %}</p></div>
-                <div class="wide-block"><h3>About</h3><p>{{ user.company_description|default:'Tell trainees about your organisation.' }}</p></div>
+        {# ── Left column ── #}
+        <div class="profile-col-left">
+
+            {% if user.bio %}
+            <div class="profile-section">
+                <h2>About</h2>
+                <p style="white-space:pre-wrap;">{{ user.bio }}</p>
+            </div>
             {% endif %}
 
-            <div class="wide-block">
-                <h3>Links</h3>
+            {% if user.user_type == 'student' %}
+
+            <div class="profile-section">
+                <h2>Academic Details</h2>
+                <table class="info-table">
+                    {% if user.institution %}<tr><th>Institution</th><td>{{ user.institution }}</td></tr>{% endif %}
+                    {% if user.course %}<tr><th>Course</th><td>{{ user.course }}</td></tr>{% endif %}
+                    {% if user.level %}<tr><th>Level</th><td>{{ user.get_level_display }}</td></tr>{% endif %}
+                    {% if user.graduation_year %}<tr><th>Expected graduation</th><td>{{ user.graduation_year }}</td></tr>{% endif %}
+                    {% if user.nationality %}<tr><th>Nationality</th><td>{{ user.nationality }}</td></tr>{% endif %}
+                    {% if user.county %}<tr><th>County</th><td>{{ user.county }}</td></tr>{% endif %}
+                    {% if user.languages %}<tr><th>Languages</th><td>{{ user.languages }}</td></tr>{% endif %}
+                    {% if user.preferred_job_type %}<tr><th>Preferred job type</th><td>{{ user.preferred_job_type }}</td></tr>{% endif %}
+                    {% if user.expected_salary %}<tr><th>Expected salary</th><td>{{ user.expected_salary }}</td></tr>{% endif %}
+                </table>
+            </div>
+
+            {% if user.skills %}
+            <div class="profile-section">
+                <h2>Skills</h2>
+                <div class="skills-tags">
+                    {% for sk in user.skills.split %}
+                        <span class="skill-tag">{{ sk|cut:"," }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if user.certifications %}
+            <div class="profile-section">
+                <h2>Certifications</h2>
+                <p style="white-space:pre-wrap;">{{ user.certifications }}</p>
+            </div>
+            {% endif %}
+
+            {% if user.work_experience %}
+            <div class="profile-section">
+                <h2>Work &amp; Attachment Experience</h2>
+                <p style="white-space:pre-wrap;">{{ user.work_experience }}</p>
+            </div>
+            {% endif %}
+
+            {% if user.achievements %}
+            <div class="profile-section">
+                <h2>Awards &amp; Achievements</h2>
+                <p style="white-space:pre-wrap;">{{ user.achievements }}</p>
+            </div>
+            {% endif %}
+
+            {% if user.projects %}
+            <div class="profile-section">
+                <h2>Projects Description</h2>
+                <p style="white-space:pre-wrap;">{{ user.projects }}</p>
+            </div>
+            {% endif %}
+
+            {% if user.hobbies %}
+            <div class="profile-section">
+                <h2>Interests &amp; Hobbies</h2>
+                <p>{{ user.hobbies }}</p>
+            </div>
+            {% endif %}
+
+            {% if user.references %}
+            <div class="profile-section">
+                <h2>References</h2>
+                <p style="white-space:pre-wrap;">{{ user.references }}</p>
+            </div>
+            {% endif %}
+
+            {% elif user.user_type == 'trainer' %}
+
+            <div class="profile-section">
+                <h2>Trainer Details</h2>
+                <table class="info-table">
+                    {% if user.trainer_title %}<tr><th>Title</th><td>{{ user.trainer_title }}</td></tr>{% endif %}
+                    {% if user.trainer_department %}<tr><th>Department</th><td>{{ user.trainer_department }}</td></tr>{% endif %}
+                    {% if user.institution %}<tr><th>Institution</th><td>{{ user.institution }}</td></tr>{% endif %}
+                    {% if user.trainer_years_experience %}<tr><th>Years of experience</th><td>{{ user.trainer_years_experience }}</td></tr>{% endif %}
+                    {% if user.county %}<tr><th>County</th><td>{{ user.county }}</td></tr>{% endif %}
+                </table>
+            </div>
+
+            {% if user.trainer_expertise %}
+            <div class="profile-section">
+                <h2>Expertise Areas</h2>
+                <div class="skills-tags">
+                    {% for ex in user.trainer_expertise.split %}
+                        <span class="skill-tag">{{ ex|cut:"," }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% else %}
+
+            <div class="profile-section">
+                <h2>Organisation Details</h2>
+                <table class="info-table">
+                    {% if user.company_name %}<tr><th>Name</th><td>{{ user.company_name }}</td></tr>{% endif %}
+                    {% if user.company_website %}<tr><th>Website</th><td><a href="{{ user.company_website }}" target="_blank" rel="noopener">{{ user.company_website }}</a></td></tr>{% endif %}
+                    {% if user.county %}<tr><th>County</th><td>{{ user.county }}</td></tr>{% endif %}
+                </table>
+                {% if user.company_description %}<p style="margin-top:0.75rem;white-space:pre-wrap;">{{ user.company_description }}</p>{% endif %}
+            </div>
+
+            {% endif %}
+
+            {# Links #}
+            {% if user.linkedin_url or user.github_url or user.portfolio_url or user.cv %}
+            <div class="profile-section">
+                <h2>Links &amp; Documents</h2>
                 <div class="link-row">
                     {% if user.linkedin_url %}<a href="{{ user.linkedin_url }}" class="btn btn-outline" target="_blank" rel="noopener">LinkedIn</a>{% endif %}
                     {% if user.github_url %}<a href="{{ user.github_url }}" class="btn btn-outline" target="_blank" rel="noopener">GitHub</a>{% endif %}
@@ -72,59 +212,161 @@
                     {% if user.cv %}<a href="{{ user.cv.url }}" class="btn btn-outline" target="_blank" rel="noopener">Download CV</a>{% endif %}
                 </div>
             </div>
+            {% endif %}
         </div>
 
-        {% if user.user_type == 'student' %}
+        {# ── Right column ── #}
+        <div class="profile-col-right">
+
+            {% if user.user_type == 'student' %}
+
+            {# Badges #}
+            {% if my_badges %}
             <div class="profile-section">
-                <h2>My Projects</h2>
-                <a href="/projects/add/" class="btn btn-outline">+ Add Project</a>
-                <a href="{% url 'projects:portfolio' user.pk %}" class="btn btn-outline">View Public Portfolio</a>
+                <h2>Badges</h2>
+                <div class="badge-strip">
+                    {% for badge in my_badges %}
+                        <div class="badge-item">
+                            <strong>{{ badge.title }}</strong>
+                            <p class="muted small">{{ badge.description }}</p>
+                            <p class="muted small" style="font-size:0.75rem;">Awarded by {{ badge.awarded_by.get_full_name }} &middot; {{ badge.awarded_at|date:"M Y" }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
-            {% if user.badges.exists %}
-                <div class="profile-section">
-                    <h2>Recognition</h2>
-                    <div class="badge-strip">
-                        {% for badge in user.badges.all %}
-                            <div class="badge-item">
-                                <span>🏅 {{ badge.title }}</span>
-                                <p class="muted small">{{ badge.description }}</p>
-                            </div>
-                        {% endfor %}
+            {% endif %}
+
+            {# My Projects #}
+            <div class="profile-section">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <h2>Projects</h2>
+                    <div style="display:flex;gap:0.5rem;">
+                        <a href="/projects/add/" class="btn btn-outline">+ Add</a>
+                        <a href="{% url 'projects:portfolio' user.pk %}" class="btn btn-outline">View portfolio</a>
                     </div>
                 </div>
-            {% endif %}
-        {% endif %}
+                {% if my_projects %}
+                <div class="project-mini-list">
+                    {% for proj in my_projects %}
+                    <div class="project-mini-card">
+                        <div>
+                            <a href="{% url 'projects:detail' proj.pk %}" class="project-mini-title">{{ proj.title }}</a>
+                            <p class="muted small">{{ proj.course_area }}{% if proj.status %} &middot; <span class="badge badge-neutral" style="font-size:0.7rem;">{{ proj.status }}</span>{% endif %}</p>
+                        </div>
+                        <p class="muted small">{{ proj.created_at|date:"d M Y" }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="muted">No projects yet. <a href="/projects/add/">Add your first project.</a></p>
+                {% endif %}
+            </div>
 
-        <!-- QR Code Section -->
-        <div class="profile-section qr-section">
-            <h2>My Profile QR Code</h2>
-            <p class="muted">Share this QR code at events or job fairs — anyone who scans it will see your public profile.</p>
-            <div class="qr-wrapper">
-                <img
-                    src="{% url 'accounts:profile_qr' user.username %}"
-                    alt="QR code for {{ user.get_full_name }}"
-                    class="qr-image"
-                    width="180"
-                    height="180"
-                />
+            {# Evaluations #}
+            {% if my_evaluations %}
+            <div class="profile-section">
+                <h2>Trainer Evaluations</h2>
+                <div class="eval-list">
+                    {% for ev in my_evaluations %}
+                    <div class="eval-item">
+                        <div style="display:flex;justify-content:space-between;">
+                            <strong>{{ ev.trainer.get_full_name }}</strong>
+                            <span class="badge badge-accent">&#9733; {{ ev.rating }}/5</span>
+                        </div>
+                        {% if ev.project %}<p class="muted small">Project: {{ ev.project.title }}</p>{% endif %}
+                        {% if ev.comments %}<p style="font-size:0.88rem;">{{ ev.comments }}</p>{% endif %}
+                        <p class="muted small">{{ ev.created_at|date:"d M Y" }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
-            <div class="link-row" style="margin-top:0.75rem;">
-                <a
-                    href="{% url 'accounts:profile_qr' user.username %}"
-                    download="{{ user.username }}_qr.png"
-                    class="btn btn-outline"
-                >Download QR Code</a>
-                <a
-                    href="{% url 'accounts:qr_print' user.username %}"
-                    class="btn btn-outline"
-                    target="_blank" rel="noopener"
-                >🖨 Print QR Card</a>
-                <a
-                    href="{% url 'accounts:public_profile' user.username %}"
-                    class="btn btn-outline"
-                    target="_blank" rel="noopener"
-                >Preview Public Profile</a>
+            {% endif %}
+
+            {# Job applications #}
+            {% if opp_apps %}
+            <div class="profile-section">
+                <h2>Job Applications</h2>
+                <div class="app-list">
+                    {% for app in opp_apps %}
+                    <div class="app-item">
+                        <span>{{ app.opportunity.title }}</span>
+                        <span class="badge badge-neutral">{{ app.status|default:"Submitted" }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
+            {% endif %}
+
+            {# Service applications #}
+            {% if service_apps %}
+            <div class="profile-section">
+                <h2>Freelance Applications</h2>
+                <div class="app-list">
+                    {% for app in service_apps %}
+                    <div class="app-item">
+                        <span>{{ app.listing.title }}</span>
+                        <span class="badge badge-neutral">{{ app.get_status_display }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% elif user.user_type == 'trainer' %}
+
+            {% if recent_evaluations %}
+            <div class="profile-section">
+                <h2>Recent Evaluations Given</h2>
+                <div class="eval-list">
+                    {% for ev in recent_evaluations %}
+                    <div class="eval-item">
+                        <div style="display:flex;justify-content:space-between;">
+                            <strong>{{ ev.trainee.get_full_name }}</strong>
+                            <span class="badge badge-accent">&#9733; {{ ev.rating }}/5</span>
+                        </div>
+                        {% if ev.project %}<p class="muted small">{{ ev.project.title }}</p>{% endif %}
+                        <p class="muted small">{{ ev.created_at|date:"d M Y" }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if badges_awarded %}
+            <div class="profile-section">
+                <h2>Badges Awarded</h2>
+                <div class="badge-strip">
+                    {% for badge in badges_awarded %}
+                    <div class="badge-item">
+                        <strong>{{ badge.title }}</strong>
+                        <p class="muted small">To: {{ badge.trainee.get_full_name }}</p>
+                        <p class="muted small" style="font-size:0.75rem;">{{ badge.awarded_at|date:"d M Y" }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% endif %}
+
+            {# ── QR Code ── #}
+            <div class="profile-section qr-section">
+                <h2>My QR Code</h2>
+                <p class="muted" style="font-size:0.85rem;">Share at events &mdash; scan to view your public profile.</p>
+                <div class="qr-wrapper">
+                    <img
+                        src="{% url 'accounts:profile_qr' user.username %}"
+                        alt="QR code"
+                        class="qr-image"
+                        width="160" height="160"
+                    />
+                </div>
+                <div class="link-row" style="margin-top:0.75rem;flex-wrap:wrap;">
+                    <a href="{% url 'accounts:profile_qr' user.username %}" download="{{ user.username }}_qr.png" class="btn btn-outline">Download QR</a>
+                    <a href="{% url 'accounts:qr_print' user.username %}" class="btn btn-outline" target="_blank" rel="noopener">Print card</a>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

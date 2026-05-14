@@ -42,32 +42,446 @@
     <form method="post" enctype="multipart/form-data" class="form-card">
         {% csrf_token %}
         {{ form.non_field_errors }}
-        {% for field in form %}
-            {% if user.user_type == 'student' and field.name in 'trainer_title trainer_department trainer_expertise trainer_years_experience company_name company_website company_description' %}
-                {# hide irrelevant fields for students #}
-            {% elif user.user_type == 'trainer' and field.name in 'course level graduation_year skills projects cv is_available company_name company_website company_description' %}
-                {# hide irrelevant fields for trainers #}
-            {% elif user.user_type in 'company individual' and field.name in 'course level graduation_year skills projects cv is_available trainer_title trainer_department trainer_expertise trainer_years_experience' %}
-                {# hide irrelevant fields for company/individual #}
-            {% else %}
-                <div class="field-wrap {% if field.errors %}field-error{% endif %}">
-                    <div class="field-label-row">
-                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                        {% if field.name in 'bio skills projects company_description trainer_expertise' %}
-                            <button
-                                type="button"
-                                class="btn-ai-assist"
-                                data-field="{{ field.name }}"
-                                data-label="{{ field.label }}"
-                                data-target="{{ field.id_for_label }}"
-                            >✨ AI</button>
-                        {% endif %}
-                    </div>
-                    {{ field }}
-                    {% if field.help_text %}<p class="help-text">{{ field.help_text }}</p>{% endif %}
-                    {% for error in field.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+
+        {# ----- Personal / common fields ----- #}
+        <h3 style="margin-top:1.5rem;">Personal Information</h3>
+
+        <div class="field-wrap {% if form.first_name.errors %}field-error{% endif %}">
+            <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+            {{ form.first_name }}{% for e in form.first_name.errors %}<p class="error-msg">{{ e }}</p>{% endfor %}
+        </div>
+        <div class="field-wrap {% if form.last_name.errors %}field-error{% endif %}">
+            <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+            {{ form.last_name }}{% for e in form.last_name.errors %}<p class="error-msg">{{ e }}</p>{% endfor %}
+        </div>
+        <div class="field-wrap {% if form.email.errors %}field-error{% endif %}">
+            <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+            {{ form.email }}{% for e in form.email.errors %}<p class="error-msg">{{ e }}</p>{% endfor %}
+        </div>
+        <div class="field-wrap {% if form.phone_number.errors %}field-error{% endif %}">
+            <label for="{{ form.phone_number.id_for_label }}">{{ form.phone_number.label }}</label>
+            {{ form.phone_number }}{% for e in form.phone_number.errors %}<p class="error-msg">{{ e }}</p>{% endfor %}
+        </div>
+        <div class="field-wrap {% if form.nationality.errors %}field-error{% endif %}">
+            <label for="{{ form.nationality.id_for_label }}">{{ form.nationality.label }}</label>
+            {{ form.nationality }}{% for e in form.nationality.errors %}<p class="error-msg">{{ e }}</p>{% endfor %}
+        </div>
+        <div class="field-wrap {% if form.county.errors %}field-error{% endif %}">
+            <label for="{{ form.county.id_for_label }}">{{ form.county.label }}</label>
+            {{ form.county }}{% for e in form.county.errors %}<p class="error-msg">{{ e }}</p>{% endfor %}
+        </div>
+        <div class="field-wrap {% if form.profile_photo.errors %}field-error{% endif %}">
+            <label for="{{ form.profile_photo.id_for_label }}">{{ form.profile_photo.label }}</label>
+            {{ form.profile_photo }}{% for e in form.profile_photo.errors %}<p class="error-msg">{{ e }}</p>{% endfor %}
+        </div>
+        <div class="field-wrap {% if form.bio.errors %}field-error{% endif %}">
+            <div class="field-label-row">
+                <label for="{{ form.bio.id_for_label }}">{{ form.bio.label }}</label>
+                <button type="button" class="btn-ai-assist" data-field="bio" data-label="Bio" data-target="{{ form.bio.id_for_label }}">✨ AI</button>
+            </div>
+            {{ form.bio }}{% for e in form.bio.errors %}<p class="error-msg">{{ e }}</p>{% endfor %}
+        </div>
+
+        {# ----- Student-only fields ----- #}
+        {% if user.user_type == 'student' %}
+
+        <h3 style="margin-top:1.5rem;">Academic Details</h3>
+        <div class="field-wrap {% if form.institution.errors %}field-error{% endif %}">
+            <label for="{{ form.institution.id_for_label }}">{{ form.institution.label }}</label>
+            {{ form.institution }}{% for e in form.institution.errors %}<p class="error-msg">{{ e }}</p>{% endfor %}
+        </div>
+        <div class="field-wrap {% if form.course.errors %}field-error{% endif %}">
+            <label for="{{ form.course.id_for_label }}">{{ form.course.label }}</label>
+            {{ form.course }}{% for e in form.course.errors %}<p class="error-msg">{{ e }}</p>{% endfor %}
+        </div>
+        <div class="field-wrap {% if form.level.errors %}field-error{% endif %}">
+            <label for="{{ form.level.id_for_label }}">{{ form.level.label }}</label>
+            {{ form.level }}{% for e in form.level.errors %}<p class="error-msg">{{ e }}</p>{% endfor %}
+        </div>
+        <div class="field-wrap {% if form.graduation_year.errors %}field-error{% endif %}">
+            <label for="{{ form.graduation_year.id_for_label }}">{{ form.graduation_year.label }}</label>
+            {{ form.graduation_year }}{% for e in form.graduation_year.errors %}<p class="error-msg">{{ e }}</p>{% endfor %}
+        </div>
+        <div class="field-wrap {% if form.id_number.errors %}field-error{% endif %}">
+            <label for="{{ form.id_number.id_for_label }}">{{ form.id_number.label }}</label>
+            {{ form.id_number }}<p class="help-text">{{ form.id_number.help_text }}</p>{% for e in form.id_number.errors %}<p class="error-msg">{{ e }}</p>{% endfor %}
+        </div>
+
+        <h3 style="margin-top:1.5rem;">Skills &amp; Experience</h3>
+        <div class="field-wrap {% if form.skills.errors %}field-error{% endif %}">
+            <div class="field-label-row">
+                <label for="{{ form.skills.id_for_label }}">{{ form.skills.label }}</label>
+                <button type="button" class="btn-ai-assist" data-field="skills" data-label="Skills" data-target="{{ form.skills.id_for_label }}">✨ AI</button>
+            </div>
+            {{ form.skills }}<p class="help-text">{{ form.skills.help_text }}</p>{% for e in form.skills.errors %}<p class="error-msg">{{ e }}</p>{% endfor %}
+        </div>
+        <div class="field-wrap {% if form.languages.errors %}field-error{% endif %}">
+            <label for="{{ form.languages.id_for_label }}">{{ form.languages.label }}</label>
+            {{ form.languages }}<p class="help-text">{{ form.languages.help_text }}</p>{% for e in form.languages.errors %}<p class="error-msg">{{ e }}</p>{% endfor %}
+        </div>
+        <div class="field-wrap {% if form.certifications.errors %}field-error{% endif %}">
+            <div class="field-label-row">
+                <label for="{{ form.certifications.id_for_label }}">{{ form.certifications.label }}</label>
+                <button type="button" class="btn-ai-assist" data-field="certifications" data-label="Certifications" data-target="{{ form.certifications.id_for_label }}">✨ AI</button>
+            </div>
+            {{ form.certifications }}<p class="help-text">{{ form.certifications.help_text }}</p>{% for e in form.certifications.errors %}<p class="error-msg">{{ e }}</p>{% endfor %}
+        </div>
+        <div class="field-wrap {% if form.work_experience.errors %}field-error{% endif %}">
+            <div class="field-label-row">
+                <label for="{{ form.work_experience.id_for_label }}">{{ form.work_experience.label }}</label>
+                <button type="button" class="btn-ai-assist" data-field="work_experience" data-label="Work Experience" data-target="{{ form.work_experience.id_for_label }}">✨ AI</button>
+            </div>
+            {{ form.work_experience }}<p class="help-text">{{ form.work_experience.help_text }}</p>{% for e in form.work_experience.errors %}<p class="error-msg">{{ e }}</p>{% endfor %}
+        </div>
+        <div class="field-wrap {% if form.achievements.errors %}field-error{% endif %}">
+            <div class="field-label-row">
+                <label for="{{ form.achievements.id_for_label }}">{{ form.achievements.label }}</label>
+                <button type="button" class="btn-ai-assist" data-field="achievements" data-label="Achievements" data-target="{{ form.achievements.id_for_label }}">✨ AI</button>
+            </div>
+            {{ form.achievements }}<p class="help-text">{{ form.achievements.help_text }}</p>{% for e in form.achievements.errors %}<p class="error-msg">{{ e }}</p>{% endfor %}
+        </div>
+        <div class="field-wrap {% if form.projects.errors %}field-error{% endif %}">
+            <div class="field-label-row">
+                <label for="{{ form.projects.id_for_label }}">{{ form.projects.label }}</label>
+                <button type="button" class="btn-ai-assist" data-field="projects" data-label="Projects" data-target="{{ form.projects.id_for_label }}">✨ AI</button>
+            </div>
+            {{ form.projects }}<p class="help-text">{{ form.projects.help_text }}</p>{% for e in form.projects.errors %}<p class="error-msg">{{ e }}</p>{% endfor %}
+        </div>
+
+        <h3 style="margin-top:1.5rem;">Career Preferences</h3>
+        <div class="field-wrap">
+            <label for="{{ form.hobbies.id_for_label }}">{{ form.hobbies.label }}</label>
+            {{ form.hobbies }}
+        </div>
+        <div class="field-wrap">
+            <label for="{{ form.preferred_job_type.id_for_label }}">{{ form.preferred_job_type.label }}</label>
+            {{ form.preferred_job_type }}<p class="help-text">{{ form.preferred_job_type.help_text }}</p>
+        </div>
+        <div class="field-wrap">
+            <label for="{{ form.expected_salary.id_for_label }}">{{ form.expected_salary.label }}</label>
+            {{ form.expected_salary }}<p class="help-text">{{ form.expected_salary.help_text }}</p>
+        </div>
+        <div class="field-wrap">
+            <label for="{{ form.is_available.id_for_label }}">{{ form.is_available.label }}</label>
+            {{ form.is_available }}
+        </div>
+
+        <h3 style="margin-top:1.5rem;">Documents &amp; References</h3>
+        <div class="field-wrap">
+            <label for="{{ form.cv.id_for_label }}">{{ form.cv.label }}</label>
+            {{ form.cv }}
+        </div>
+        <div class="field-wrap {% if form.references.errors %}field-error{% endif %}">
+            <label for="{{ form.references.id_for_label }}">{{ form.references.label }}</label>
+            {{ form.references }}<p class="help-text">{{ form.references.help_text }}</p>{% for e in form.references.errors %}<p class="error-msg">{{ e }}</p>{% endfor %}
+        </div>
+
+        {% endif %}{# end student #}
+
+        {# ----- Trainer-only fields ----- #}
+        {% if user.user_type == 'trainer' %}
+
+        <h3 style="margin-top:1.5rem;">Trainer Details</h3>
+        <div class="field-wrap">
+            <label for="{{ form.institution.id_for_label }}">{{ form.institution.label }}</label>
+            {{ form.institution }}
+        </div>
+        <div class="field-wrap">
+            <label for="{{ form.trainer_title.id_for_label }}">{{ form.trainer_title.label }}</label>
+            {{ form.trainer_title }}
+        </div>
+        <div class="field-wrap">
+            <label for="{{ form.trainer_department.id_for_label }}">{{ form.trainer_department.label }}</label>
+            {{ form.trainer_department }}
+        </div>
+        <div class="field-wrap">
+            <label for="{{ form.trainer_years_experience.id_for_label }}">{{ form.trainer_years_experience.label }}</label>
+            {{ form.trainer_years_experience }}
+        </div>
+        <div class="field-wrap">
+            <div class="field-label-row">
+                <label for="{{ form.trainer_expertise.id_for_label }}">{{ form.trainer_expertise.label }}</label>
+                <button type="button" class="btn-ai-assist" data-field="trainer_expertise" data-label="Expertise" data-target="{{ form.trainer_expertise.id_for_label }}">✨ AI</button>
+            </div>
+            {{ form.trainer_expertise }}<p class="help-text">{{ form.trainer_expertise.help_text }}</p>
+        </div>
+
+        {% endif %}{# end trainer #}
+
+        {# ----- Company / Individual fields ----- #}
+        {% if user.user_type == 'company' or user.user_type == 'individual' %}
+
+        <h3 style="margin-top:1.5rem;">Organisation Details</h3>
+        <div class="field-wrap">
+            <label for="{{ form.company_name.id_for_label }}">{{ form.company_name.label }}</label>
+            {{ form.company_name }}
+        </div>
+        <div class="field-wrap">
+            <label for="{{ form.company_website.id_for_label }}">{{ form.company_website.label }}</label>
+            {{ form.company_website }}
+        </div>
+        <div class="field-wrap">
+            <div class="field-label-row">
+                <label for="{{ form.company_description.id_for_label }}">{{ form.company_description.label }}</label>
+                <button type="button" class="btn-ai-assist" data-field="company_description" data-label="Description" data-target="{{ form.company_description.id_for_label }}">✨ AI</button>
+            </div>
+            {{ form.company_description }}<p class="help-text">{{ form.company_description.help_text }}</p>
+        </div>
+
+        {% endif %}{# end company/individual #}
+
+        {# ----- Links (all users) ----- #}
+        <h3 style="margin-top:1.5rem;">Online Presence</h3>
+        <div class="field-wrap">
+            <label for="{{ form.linkedin_url.id_for_label }}">{{ form.linkedin_url.label }}</label>
+            {{ form.linkedin_url }}
+        </div>
+        <div class="field-wrap">
+            <label for="{{ form.github_url.id_for_label }}">{{ form.github_url.label }}</label>
+            {{ form.github_url }}
+        </div>
+        <div class="field-wrap">
+            <label for="{{ form.portfolio_url.id_for_label }}">{{ form.portfolio_url.label }}</label>
+            {{ form.portfolio_url }}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save changes</button>
+            <a href="/accounts/profile/" class="btn btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+(function () {
+    const panel = document.getElementById('ai-panel');
+    const closeBtn = document.getElementById('ai-close');
+    const fieldLabel = document.getElementById('ai-field-label');
+    const promptInput = document.getElementById('ai-prompt-input');
+    const submitBtn = document.getElementById('ai-submit-btn');
+    const loadingEl = document.getElementById('ai-loading');
+    const resultWrap = document.getElementById('ai-result-wrap');
+    const resultText = document.getElementById('ai-result-text');
+    const applyBtn = document.getElementById('ai-apply-btn');
+    const retryBtn = document.getElementById('ai-retry-btn');
+    const errorEl = document.getElementById('ai-error');
+
+    let activeField = null;
+    let activeTarget = null;
+    let lastResult = '';
+
+    document.querySelectorAll('.btn-ai-assist').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            activeField = btn.dataset.field;
+            activeTarget = document.getElementById(btn.dataset.target);
+            fieldLabel.textContent = 'Helping with: ' + btn.dataset.label;
+            promptInput.value = '';
+            resultWrap.style.display = 'none';
+            errorEl.style.display = 'none';
+            resultText.textContent = '';
+            panel.style.display = 'block';
+            promptInput.focus();
+            panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+
+    closeBtn.addEventListener('click', function () { panel.style.display = 'none'; });
+
+    function getCsrf() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+
+    function runAI() {
+        const prompt = promptInput.value.trim();
+        if (!prompt) { promptInput.focus(); return; }
+        submitBtn.disabled = true;
+        loadingEl.style.display = 'inline';
+        resultWrap.style.display = 'none';
+        errorEl.style.display = 'none';
+
+        const body = new URLSearchParams();
+        body.append('field', activeField);
+        body.append('prompt', prompt);
+
+        fetch('{% url "accounts:ai_assist" %}', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCsrf() },
+            body: body,
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            loadingEl.style.display = 'none';
+            submitBtn.disabled = false;
+            if (data.error) {
+                errorEl.textContent = data.error;
+                errorEl.style.display = 'block';
+                return;
+            }
+            lastResult = data.result;
+            resultText.textContent = lastResult;
+            resultWrap.style.display = 'block';
+        })
+        .catch(function () {
+            loadingEl.style.display = 'none';
+            submitBtn.disabled = false;
+            errorEl.textContent = 'Network error. Please try again.';
+            errorEl.style.display = 'block';
+        });
+    }
+
+    submitBtn.addEventListener('click', runAI);
+    retryBtn.addEventListener('click', runAI);
+    promptInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) runAI();
+    });
+
+    applyBtn.addEventListener('click', function () {
+        if (activeTarget && lastResult) {
+            activeTarget.value = lastResult;
+            panel.style.display = 'none';
+            activeTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            activeTarget.focus();
+        }
+    });
+})();
+</script>
+{% endblock %}
+            {% if field %}
+            <div class="field-wrap {% if field.errors %}field-error{% endif %}">
+                <div class="field-label-row">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {% if field.name == 'bio' %}
+                        <button type="button" class="btn-ai-assist" data-field="{{ field.name }}" data-label="{{ field.label }}" data-target="{{ field.id_for_label }}">✨ AI</button>
+                    {% endif %}
                 </div>
+                {{ field }}
+                {% if field.help_text %}<p class="help-text">{{ field.help_text }}</p>{% endif %}
+                {% for error in field.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+            </div>
             {% endif %}
+            {% endwith %}
+        {% endfor %}
+
+        {# ----- Student-only fields ----- #}
+        {% if user.user_type == 'student' %}
+        <h3 style="margin-top:1.5rem;">Academic Details</h3>
+        {% for fn in 'institution course level graduation_year id_number' %}
+            {% with form|getfield:fn as field %}
+            {% if field %}
+            <div class="field-wrap {% if field.errors %}field-error{% endif %}">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<p class="help-text">{{ field.help_text }}</p>{% endif %}
+                {% for error in field.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+        {% endfor %}
+
+        <h3 style="margin-top:1.5rem;">Skills &amp; Experience</h3>
+        {% for fn in 'skills languages certifications work_experience achievements projects' %}
+            {% with form|getfield:fn as field %}
+            {% if field %}
+            <div class="field-wrap {% if field.errors %}field-error{% endif %}">
+                <div class="field-label-row">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {% if field.name in 'skills certifications work_experience achievements projects' %}
+                        <button type="button" class="btn-ai-assist" data-field="{{ field.name }}" data-label="{{ field.label }}" data-target="{{ field.id_for_label }}">✨ AI</button>
+                    {% endif %}
+                </div>
+                {{ field }}
+                {% if field.help_text %}<p class="help-text">{{ field.help_text }}</p>{% endif %}
+                {% for error in field.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+        {% endfor %}
+
+        <h3 style="margin-top:1.5rem;">Career Preferences</h3>
+        {% for fn in 'hobbies preferred_job_type expected_salary is_available' %}
+            {% with form|getfield:fn as field %}
+            {% if field %}
+            <div class="field-wrap {% if field.errors %}field-error{% endif %}">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<p class="help-text">{{ field.help_text }}</p>{% endif %}
+                {% for error in field.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+        {% endfor %}
+
+        <h3 style="margin-top:1.5rem;">Documents &amp; References</h3>
+        {% for fn in 'cv references' %}
+            {% with form|getfield:fn as field %}
+            {% if field %}
+            <div class="field-wrap {% if field.errors %}field-error{% endif %}">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<p class="help-text">{{ field.help_text }}</p>{% endif %}
+                {% for error in field.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+        {% endfor %}
+        {% endif %}
+
+        {# ----- Trainer-only fields ----- #}
+        {% if user.user_type == 'trainer' %}
+        <h3 style="margin-top:1.5rem;">Trainer Details</h3>
+        {% for fn in 'institution trainer_title trainer_department trainer_years_experience trainer_expertise' %}
+            {% with form|getfield:fn as field %}
+            {% if field %}
+            <div class="field-wrap {% if field.errors %}field-error{% endif %}">
+                <div class="field-label-row">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {% if field.name == 'trainer_expertise' %}
+                        <button type="button" class="btn-ai-assist" data-field="{{ field.name }}" data-label="{{ field.label }}" data-target="{{ field.id_for_label }}">✨ AI</button>
+                    {% endif %}
+                </div>
+                {{ field }}
+                {% if field.help_text %}<p class="help-text">{{ field.help_text }}</p>{% endif %}
+                {% for error in field.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+        {% endfor %}
+        {% endif %}
+
+        {# ----- Company / Individual fields ----- #}
+        {% if user.user_type == 'company' or user.user_type == 'individual' %}
+        <h3 style="margin-top:1.5rem;">Organisation Details</h3>
+        {% for fn in 'company_name company_website company_description' %}
+            {% with form|getfield:fn as field %}
+            {% if field %}
+            <div class="field-wrap {% if field.errors %}field-error{% endif %}">
+                <div class="field-label-row">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {% if field.name == 'company_description' %}
+                        <button type="button" class="btn-ai-assist" data-field="{{ field.name }}" data-label="{{ field.label }}" data-target="{{ field.id_for_label }}">✨ AI</button>
+                    {% endif %}
+                </div>
+                {{ field }}
+                {% if field.help_text %}<p class="help-text">{{ field.help_text }}</p>{% endif %}
+                {% for error in field.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+        {% endfor %}
+        {% endif %}
+
+        {# ----- Links (all users) ----- #}
+        <h3 style="margin-top:1.5rem;">Online Presence</h3>
+        {% for fn in 'linkedin_url github_url portfolio_url' %}
+            {% with form|getfield:fn as field %}
+            {% if field %}
+            <div class="field-wrap {% if field.errors %}field-error{% endif %}">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% for error in field.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
         {% endfor %}
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Save changes</button>

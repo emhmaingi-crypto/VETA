@@ -39,7 +39,21 @@ class RegisterView(generic.CreateView):
 
 
 def profile_view(request):
-    return render(request, 'accounts/profile.html', {'user': request.user})
+    user = request.user
+    ctx = {'user': user}
+    if user.user_type == 'student':
+        ctx['my_projects'] = Project.objects.filter(trainee=user).order_by('-created_at')[:6]
+        ctx['my_badges'] = RecognitionBadge.objects.filter(trainee=user).order_by('-awarded_at')
+        ctx['my_evaluations'] = TrainerEvaluation.objects.filter(trainee=user).select_related('trainer', 'project').order_by('-created_at')[:5]
+        ctx['service_apps'] = ServiceApplication.objects.filter(freelancer=user).select_related('listing').order_by('-created_at')[:5]
+        ctx['opp_apps'] = Application.objects.filter(student=user).select_related('opportunity').order_by('-created_at')[:5]
+        ctx['avg_rating'] = user.average_rating
+    elif user.user_type == 'trainer':
+        ctx['evaluated_count'] = TrainerEvaluation.objects.filter(trainer=user).count()
+        ctx['badges_awarded'] = RecognitionBadge.objects.filter(awarded_by=user).select_related('trainee').order_by('-awarded_at')[:8]
+        ctx['recent_evaluations'] = TrainerEvaluation.objects.filter(trainer=user).select_related('trainee', 'project').order_by('-created_at')[:5]
+    ctx['profile_complete'] = user.profile_complete
+    return render(request, 'accounts/profile.html', ctx)
 
 
 class ProfileEditView(LoginRequiredMixin, generic.UpdateView):
@@ -130,6 +144,9 @@ _AI_FIELDS = {
     'bio': 'Bio / About me',
     'skills': 'Skills (comma-separated)',
     'projects': 'Projects & achievements',
+    'certifications': 'Certifications & short courses',
+    'work_experience': 'Work / attachment experience',
+    'achievements': 'Awards and notable achievements',
     'company_description': 'Company / Organisation description',
     'trainer_expertise': 'Trainer expertise areas',
 }

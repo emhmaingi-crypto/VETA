@@ -16,58 +16,49 @@ class StudentProfileForm(forms.ModelForm):
     class Meta:
         model = StudentUser
         fields = [
-            'first_name',
-            'last_name',
-            'email',
+            'first_name', 'last_name', 'email',
+            'profile_photo', 'phone_number', 'nationality', 'county',
             'bio',
-            'profile_photo',
-            'institution',
-            'county',
-            'course',
-            'level',
-            'graduation_year',
-            'skills',
-            'projects',
-            'linkedin_url',
-            'github_url',
-            'portfolio_url',
-            'cv',
-            'is_available',
+            # student fields
+            'institution', 'course', 'level', 'graduation_year',
+            'id_number', 'languages',
+            'skills', 'certifications', 'work_experience',
+            'achievements', 'hobbies',
+            'preferred_job_type', 'expected_salary',
+            'projects', 'references',
+            'linkedin_url', 'github_url', 'portfolio_url',
+            'cv', 'is_available',
             # trainer fields
-            'trainer_title',
-            'trainer_department',
-            'trainer_expertise',
-            'trainer_years_experience',
+            'trainer_title', 'trainer_department',
+            'trainer_expertise', 'trainer_years_experience',
             # company/individual fields
-            'company_name',
-            'company_website',
-            'company_description',
+            'company_name', 'company_website', 'company_description',
         ]
         widgets = {
             'bio': forms.Textarea(attrs={'rows': 4}),
             'skills': forms.Textarea(attrs={'rows': 2}),
             'projects': forms.Textarea(attrs={'rows': 4}),
+            'certifications': forms.Textarea(attrs={'rows': 3}),
+            'work_experience': forms.Textarea(attrs={'rows': 4}),
+            'achievements': forms.Textarea(attrs={'rows': 3}),
+            'references': forms.Textarea(attrs={'rows': 3}),
             'trainer_expertise': forms.Textarea(attrs={'rows': 2}),
             'company_description': forms.Textarea(attrs={'rows': 4}),
         }
 
 
 class StudentLoginForm(AuthenticationForm):
-    username = forms.EmailField(
+    username = forms.CharField(
         label='Email address',
-        widget=forms.EmailInput(attrs={'autofocus': True, 'placeholder': 'you@example.com'}),
+        widget=forms.TextInput(attrs={'autofocus': True, 'placeholder': 'you@example.com'}),
     )
 
     def clean(self):
-        email = self.cleaned_data.get('username', '').strip().lower()
-        self.cleaned_data['username'] = email
-        # Look up the actual username for this email (case-insensitive)
+        identifier = self.cleaned_data.get('username', '').strip()
         from .models import StudentUser
-        try:
-            user = StudentUser.objects.get(email__iexact=email)
+        # Try matching by email (case-insensitive)
+        user = StudentUser.objects.filter(email__iexact=identifier).first()
+        if user:
             self.cleaned_data['username'] = user.username
-        except StudentUser.DoesNotExist:
-            pass
-        except StudentUser.MultipleObjectsReturned:
-            pass
+        # If not found by email, leave as-is — Django will try it as a username
         return super().clean()
