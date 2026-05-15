@@ -30,7 +30,7 @@
 
     <!-- ── Right form panel ── -->
     <div class="portal-form-panel">
-        <div class="portal-form-inner" style="max-width:460px;">
+        <div class="portal-form-inner reg-form-inner">
             <div class="portal-form-header">
                 <h2>Create your account</h2>
                 <p>Already have an account? <a href="/accounts/login/">Sign in</a></p>
@@ -42,25 +42,46 @@
                 {% if form.non_field_errors %}
                 <div class="portal-error-alert">
                     {% for error in form.non_field_errors %}
-                    <span>{{ error }}</span>
-                    {% endfor %}
+                    <span>{{ error }}</span>{% endfor %}
                 </div>
                 {% endif %}
 
+                <!-- Account type card picker -->
                 <div class="portal-field">
-                    <label for="id_user_type">Account type</label>
-                    <div class="portal-input-wrap">
-                        <span class="portal-input-icon">🎭</span>
-                        {{ form.user_type }}
+                    <label>I am a…</label>
+                    <div class="acct-type-grid">
+                        <label class="acct-type-card">
+                            <input type="radio" name="user_type" value="student" checked>
+                            <span class="acct-type-icon">🎓</span>
+                            <span class="acct-type-label">Student / Graduate</span>
+                        </label>
+                        <label class="acct-type-card">
+                            <input type="radio" name="user_type" value="trainer">
+                            <span class="acct-type-icon">🧑‍🏫</span>
+                            <span class="acct-type-label">Trainer / Evaluator</span>
+                        </label>
+                        <label class="acct-type-card">
+                            <input type="radio" name="user_type" value="company">
+                            <span class="acct-type-icon">🏢</span>
+                            <span class="acct-type-label">Company</span>
+                        </label>
+                        <label class="acct-type-card">
+                            <input type="radio" name="user_type" value="individual">
+                            <span class="acct-type-icon">👤</span>
+                            <span class="acct-type-label">Individual</span>
+                        </label>
                     </div>
                     {% if form.user_type.errors %}<p class="portal-field-error">{{ form.user_type.errors.0 }}</p>{% endif %}
                 </div>
 
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <!-- Name row -->
+                <div class="reg-name-row">
                     <div class="portal-field">
                         <label for="id_first_name">First name</label>
                         <div class="portal-input-wrap">
-                            <span class="portal-input-icon">✏️</span>
+                            <span class="portal-input-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </span>
                             {{ form.first_name }}
                         </div>
                         {% if form.first_name.errors %}<p class="portal-field-error">{{ form.first_name.errors.0 }}</p>{% endif %}
@@ -68,47 +89,62 @@
                     <div class="portal-field">
                         <label for="id_last_name">Last name</label>
                         <div class="portal-input-wrap">
-                            <span class="portal-input-icon">✏️</span>
+                            <span class="portal-input-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </span>
                             {{ form.last_name }}
                         </div>
                         {% if form.last_name.errors %}<p class="portal-field-error">{{ form.last_name.errors.0 }}</p>{% endif %}
                     </div>
                 </div>
 
+                <!-- Email -->
                 <div class="portal-field">
                     <label for="id_email">Email address</label>
                     <div class="portal-input-wrap">
-                        <span class="portal-input-icon">📧</span>
+                        <span class="portal-input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                        </span>
                         {{ form.email }}
                     </div>
                     {% if form.email.errors %}<p class="portal-field-error">{{ form.email.errors.0 }}</p>{% endif %}
                 </div>
 
+                <!-- Password -->
                 <div class="portal-field">
                     <label for="id_password1">Password</label>
                     <div class="portal-input-wrap">
-                        <span class="portal-input-icon">🔒</span>
+                        <span class="portal-input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </span>
                         {{ form.password1 }}
-                        <button type="button" class="portal-eye" id="eye-btn1" title="Show or hide password" onclick="togglePass('id_password1','eye-btn1')">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <button type="button" class="portal-eye" id="eye-btn1" title="Show password" onclick="togglePass('id_password1','eye-btn1')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
                     </div>
                     {% if form.password1.errors %}<p class="portal-field-error">{{ form.password1.errors.0 }}</p>{% endif %}
+                    <p class="portal-hint">At least 8 characters, not too common.</p>
                 </div>
 
+                <!-- Confirm password -->
                 <div class="portal-field">
                     <label for="id_password2">Confirm password</label>
                     <div class="portal-input-wrap">
-                        <span class="portal-input-icon">🔒</span>
+                        <span class="portal-input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </span>
                         {{ form.password2 }}
-                        <button type="button" class="portal-eye" id="eye-btn2" title="Show or hide password" onclick="togglePass('id_password2','eye-btn2')">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <button type="button" class="portal-eye" id="eye-btn2" title="Show password" onclick="togglePass('id_password2','eye-btn2')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
                     </div>
                     {% if form.password2.errors %}<p class="portal-field-error">{{ form.password2.errors.0 }}</p>{% endif %}
                 </div>
 
-                <button type="submit" class="btn btn-primary portal-submit" style="margin-top:0.5rem;">Create account</button>
+                <button type="submit" class="btn btn-primary portal-submit reg-submit-btn">
+                    Create free account
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </button>
             </form>
 
             <p class="portal-tos">By registering you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
@@ -124,9 +160,16 @@ function togglePass(fieldId, btnId) {
     var inp = document.getElementById(fieldId);
     var btn = document.getElementById(btnId);
     if (!inp) return;
-    var show = inp.type === 'password';
-    inp.type = show ? 'text' : 'password';
-    btn.style.color = show ? 'var(--brand)' : '';
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    btn.style.color = inp.type === 'text' ? 'var(--brand)' : '';
 }
+// Highlight the selected account type card
+document.querySelectorAll('.acct-type-card input[type=radio]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+        document.querySelectorAll('.acct-type-card').forEach(function(c) { c.classList.remove('selected'); });
+        if (this.checked) this.closest('.acct-type-card').classList.add('selected');
+    });
+    if (radio.checked) radio.closest('.acct-type-card').classList.add('selected');
+});
 </script>
 {% endblock %}
